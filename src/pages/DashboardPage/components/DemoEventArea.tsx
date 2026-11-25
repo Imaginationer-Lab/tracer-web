@@ -2,7 +2,7 @@ import type { ProviderSummary } from '../../../api/contract'
 import { Alert } from '../../../components/ui/Alert'
 import { Button } from '../../../components/ui/Button'
 import type { DemoEventLoad } from '../../../hooks/useDemoEvent'
-import { PROVIDER_NAMES } from '../../../lib/providers'
+import { providerName } from '../../../lib/providers'
 import { DemoEventCard } from './DemoEventCard'
 
 interface DemoEventAreaProps {
@@ -32,5 +32,5 @@ export function DemoEventArea({ load, providers, onTurnOff }: DemoEventAreaProps
 
   const { event } = load
   const detected = providers.some((provider) => provider.id === event.providerId)
-  return <DemoEventCard event={event} providerName={PROVIDER_NAMES[event.providerId]} notDetected={!detected} />
+  return <DemoEventCard event={event} providerName={providerName(event.providerId, providers)} notDetected={!detected} />
 }

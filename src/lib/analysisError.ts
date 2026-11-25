@@ -74,6 +74,13 @@ export function describeAnalysisError(error: AppError, { keepInputNote = true }:
         body: '파일 수나 용량이 분석 상한을 넘었어요. 더 작은 저장소로 시도해 주세요.',
         retry: 'none',
       }
+    case 'DETECTION_UNAVAILABLE':
+      return {
+        tone: 'error',
+        title: '외부 서비스를 판단하지 못했어요',
+        body: retryLater,
+        retry: error.retryable ? 'now' : 'none',
+      }
     case 'INTERNAL_ERROR':
       return {
         tone: 'error',
