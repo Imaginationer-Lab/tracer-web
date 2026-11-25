@@ -1,6 +1,5 @@
 import type { StepKey, StepState } from '../../../api/contract'
-import { AlertIcon } from '../../../components/icons/AlertIcon'
-import { CheckIcon } from '../../../components/icons/CheckIcon'
+import { Icon } from '../../../components/icons/Icon'
 import { Spinner } from '../../../components/ui/Spinner'
 import styles from './AnalysisProgress.module.css'
 
@@ -24,8 +23,8 @@ interface AnalysisProgressProps {
 }
 
 function StepIcon({ state }: { state: StepState }) {
-  if (state === 'done') return <CheckIcon size={14} className={styles.done} />
-  if (state === 'failed') return <AlertIcon size={14} className={styles.failedIcon} />
+  if (state === 'done') return <Icon name="check" size={14} className={styles.done} />
+  if (state === 'failed') return <Icon name="alert" size={14} className={styles.failedIcon} />
   if (state === 'running') return <Spinner size={14} className={styles.running} />
   return <span className={styles.dot} aria-hidden="true" />
 }

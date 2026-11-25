@@ -4,15 +4,121 @@
   min-height: 100dvh;
 }
 
-.body {
-  flex: 1;
-  padding: 24px;
+/* 데스크톱: 저장소 정보는 헤더 안 · 모바일: 헤더 아래 저장소 바 */
+.headerRepo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
 
   @media (max-width: 640px) {
+    display: none;
+  }
+}
+
+.slash {
+  color: var(--color-hairline);
+  font-size: 15px;
+}
+
+.repoBar {
+  display: none;
+
+  @media (max-width: 640px) {
+    display: block;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-hairline);
+    background: var(--color-surface);
+  }
+}
+
+.desktopOnly {
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+
+.mobileOnly {
+  display: none;
+
+  @media (max-width: 640px) {
+    display: inline;
+  }
+}
+
+/* 데스크톱: 왼쪽 440px(공급자) + 오른쪽(파일 트리 320px + 근거 패널), 화면 높이에 맞추고 카드 안에서 스크롤 */
+.body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 440px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 16px;
+  height: calc(100dvh - var(--header-height));
+  min-height: 560px;
+  padding: 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 360px minmax(0, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: auto;
+    min-height: 0;
     padding: 16px;
   }
 }
 
-.placeholder {
-  color: var(--color-mute);
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+
+  @media (max-width: 640px) {
+    display: contents;
+  }
+}
+
+.right {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 16px;
+  min-height: 0;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    display: contents;
+  }
+}
+
+.tree {
+  min-height: 0;
+}
+
+/* 모바일에서는 공급자를 누르면 상세 화면으로 이동한다 (#4). 근거 패널 자리는 두지 않는다 */
+.evidence {
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.centered {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  @media (max-width: 640px) {
+    align-items: flex-start;
+    padding: 16px;
+  }
 }

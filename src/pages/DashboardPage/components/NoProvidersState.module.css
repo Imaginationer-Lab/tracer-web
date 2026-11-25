@@ -1,0 +1,52 @@
+.card {
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 640px;
+  padding: 48px 40px;
+  text-align: center;
+
+  @media (max-width: 640px) {
+    gap: 10px;
+    padding: 36px 20px;
+  }
+}
+
+.icon {
+  color: var(--color-faint);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+
+  @media (max-width: 640px) {
+    font-size: 18px;
+    line-height: 26px;
+  }
+}
+
+.body {
+  color: var(--color-body);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.meta {
+  color: var(--color-mute);
+  font-size: 13px;
+
+  code {
+    color: var(--color-ink);
+  }
+}
+
+.card .action {
+  margin-top: 8px;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    height: 44px;
+  }
+}

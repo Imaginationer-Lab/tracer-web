@@ -1,0 +1,22 @@
+.empty {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.icon {
+  color: var(--color-faint);
+}
+
+.title {
+  color: var(--color-body);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.body {
+  color: var(--color-mute);
+  font-size: 13px;
+}

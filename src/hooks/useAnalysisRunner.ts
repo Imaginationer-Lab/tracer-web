@@ -3,6 +3,7 @@ import { getAnalysis, startAnalysis } from '../api/analyses'
 import { ApiRequestError } from '../api/client'
 import type { Analysis, ApiError } from '../api/contract'
 import { ANALYSIS_POLL_INTERVAL_MS, ANALYSIS_TIMEOUT_MS } from '../app/config'
+import { wait } from '../lib/wait'
 
 export type AnalysisRunState =
   | { phase: 'idle' }
@@ -24,20 +25,6 @@ const UNKNOWN_ERROR: ApiError = {
   code: 'INTERNAL_ERROR',
   message: '입력한 주소는 그대로 두었어요. 잠시 후 다시 시도해 주세요.',
   retryable: true,
-}
-
-function wait(ms: number, signal: AbortSignal): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(resolve, ms)
-    signal.addEventListener(
-      'abort',
-      () => {
-        clearTimeout(timer)
-        reject(signal.reason)
-      },
-      { once: true },
-    )
-  })
 }
 
 /**

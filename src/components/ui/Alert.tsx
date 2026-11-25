@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { AlertIcon } from '../icons/AlertIcon'
+import { Icon } from '../icons/Icon'
 import styles from './Alert.module.css'
 
 interface AlertProps {
@@ -14,7 +14,7 @@ interface AlertProps {
 export function Alert({ tone, title, children, action }: AlertProps) {
   return (
     <div className={[styles.alert, styles[tone]].join(' ')} role={tone === 'error' ? 'alert' : 'status'}>
-      <AlertIcon size={16} className={styles.icon} />
+      <Icon name="alert" size={16} className={styles.icon} />
       <div className={styles.text}>
         <p className={styles.title}>{title}</p>
         <div className={styles.body}>{children}</div>

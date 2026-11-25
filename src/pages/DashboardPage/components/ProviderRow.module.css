@@ -1,0 +1,90 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-hairline);
+
+  @media (max-width: 640px) {
+    padding: 14px 12px 14px 16px;
+  }
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+
+  strong {
+    font-size: 14px;
+    font-weight: 600;
+
+    @media (max-width: 640px) {
+      font-size: 15px;
+    }
+  }
+}
+
+.role {
+  color: var(--color-mute);
+  font-size: 13px;
+}
+
+/* 데스크톱: 근거 파일 수 ↔ 상태 문구 양끝 정렬 · 모바일: 한 줄로 " · " 연결 */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-mute);
+  font-size: 12px;
+
+  @media (max-width: 640px) {
+    justify-content: flex-start;
+    gap: 0;
+
+    .status::before {
+      content: ' · ';
+      white-space: pre;
+    }
+  }
+}
+
+.status {
+  text-align: right;
+}
+
+.retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* 모바일에서만: 눌러서 상세로 들어가는 표시 */
+.chevron {
+  display: none;
+  color: var(--color-faint);
+
+  @media (max-width: 640px) {
+    display: block;
+  }
+}
