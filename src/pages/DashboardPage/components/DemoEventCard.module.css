@@ -32,17 +32,6 @@
   color: var(--color-error);
 }
 
-/* 실제 상태 배지(꽉 찬 배지)와 구분되는 점선 배지 */
-.badge {
-  flex-shrink: 0;
-  padding: 1px 6px;
-  border: 1px dashed var(--color-mute);
-  border-radius: 4px;
-  color: var(--color-body);
-  font-size: 11px;
-  font-weight: 500;
-}
-
 .meta {
   display: flex;
   flex-wrap: wrap;

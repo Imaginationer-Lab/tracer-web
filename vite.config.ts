@@ -8,6 +8,8 @@ export default defineConfig(({ mode }) => {
   const proxy = {
     '/api': {
       target: env.API_PROXY_TARGET || 'http://localhost:3000',
+      // 배포 주소(https://tracer.kangdora.me)를 대상으로 해도 동작하도록 Host를 대상에 맞춘다
+      changeOrigin: true,
       xfwd: true,
     },
   }

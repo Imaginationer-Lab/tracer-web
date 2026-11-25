@@ -1,5 +1,6 @@
 import type { DemoEvent } from '../../../api/contract'
 import { Icon } from '../../../components/icons/Icon'
+import { DashedBadge } from '../../../components/ui/DashedBadge'
 import { formatKstDateTime } from '../../../lib/time'
 import styles from './DemoEventCard.module.css'
 
@@ -20,7 +21,7 @@ export function DemoEventCard({ event, providerName, notDetected }: DemoEventCar
           <Icon name="alert" size={16} className={styles.icon} />
           {event.title}
         </h2>
-        <span className={styles.badge}>데모 재현</span>
+        <DashedBadge>데모 재현</DashedBadge>
       </div>
       <p className={styles.meta}>
         <code className={styles.status}>HTTP {event.httpStatus}</code>

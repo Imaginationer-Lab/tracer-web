@@ -1,4 +1,4 @@
-// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 fd098e5).
+// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 2893ba6).
 // 직접 고치지 말고, 백엔드가 바뀌면 다시 복사한다. 명세: tracer-backend docs/frontend-handoff.md
 
 export type ProviderId = 'supabase' | 'stripe' | 'aws-s3';
@@ -65,8 +65,20 @@ export type FileEntry =
   | { path: string; state: 'skipped'; reason: SkipReason }
   | { path: string; state: 'other' };
 
+/** 세 공급자 밖에서 찾은 외부 서비스. 규칙으로 못 푼 단서를 AI(Claude)가 판단한 결과라 상태 연동·근거 상세는 없다 */
+export interface OtherServiceSummary {
+  /** 서비스 이름 (예: SendGrid, Kakao Maps) */
+  name: string;
+  /** 판단 재료: host, 패키지 이름, 호출식 */
+  clues: string[];
+  fileCount: number;
+  files: { path: string; line: number }[];
+}
+
 export interface AnalysisResult {
   providers: ProviderSummary[];
+  /** AI 판단이 꺼져 있거나 찾은 게 없으면 빈 배열 */
+  otherServices: OtherServiceSummary[];
   files: FileEntry[];
   summary: { analyzed: number; skipped: number };
 }
