@@ -1,11 +1,11 @@
-import type { ApiError } from '../../../api/contract'
+import type { AppError } from '../../../api/client'
 import { Alert } from '../../../components/ui/Alert'
 import { Button } from '../../../components/ui/Button'
 import { useCountdown } from '../../../hooks/useCountdown'
 import { describeAnalysisError } from '../../../lib/analysisError'
 
 interface AnalysisErrorAlertProps {
-  error: ApiError
+  error: AppError
   onRetry: () => void
 }
 
