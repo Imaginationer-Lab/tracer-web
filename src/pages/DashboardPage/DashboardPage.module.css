@@ -1,0 +1,18 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.body {
+  flex: 1;
+  padding: 24px;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+.placeholder {
+  color: var(--color-mute);
+}

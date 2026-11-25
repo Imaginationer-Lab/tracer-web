@@ -1,0 +1,23 @@
+# 로컬 전용 (저장소에 올리지 않음)
+CLAUDE.md
+DESIGN.md
+.claude/settings.local.json
+
+# 웹 저장소와 무관한 파일
+demo-store/
+demo-replay/
+analyze-demo.mjs
+
+# 빌드·의존성·환경
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+dist-ssr/
+*.local
+.vscode/*
+!.vscode/extensions.json
+.idea/

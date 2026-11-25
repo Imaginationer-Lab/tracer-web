@@ -1,0 +1,45 @@
+# 배포용 nginx 설정. 컨테이너가 뜰 때 ${API_UPSTREAM}, ${PUBLIC_ORIGIN} 이 환경변수로 채워진다.
+#   브라우저 → Cloudflare → 이 컨테이너(:80) → /api/* 는 백엔드로, 나머지는 정적 파일(SPA)
+
+# 우리 도메인에서 온 요청은 같은 출처라서 Origin 을 지워서 넘긴다 (백엔드 CORS 목록에 도메인을 넣지 않아도 되게).
+# 다른 출처에서 온 요청은 Origin 을 그대로 넘겨 백엔드가 막게 둔다.
+map $http_origin $api_origin {
+    default             $http_origin;
+    "${PUBLIC_ORIGIN}"  "";
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # 백엔드 컨테이너 이름은 요청할 때 찾는다 (백엔드가 늦게 떠도 nginx가 시작되게)
+    resolver 127.0.0.11 valid=30s ipv6=off;
+    set $api_upstream ${API_UPSTREAM};
+
+    location /api/ {
+        # 변수만 쓰면 요청 경로(/api/...)가 그대로 넘어간다
+        proxy_pass $api_upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        # 백엔드 요청 제한이 사용자 IP로 세도록 X-Forwarded-For 를 이어 붙인다 (백엔드 TRUST_PROXY=2)
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        proxy_set_header Origin $api_origin;
+        proxy_read_timeout 30s;
+    }
+
+    # 빌드 결과물은 파일 이름에 해시가 있어 오래 캐시한다
+    location /assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # 그 밖의 경로는 SPA 라우팅으로 index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
+    }
+}

@@ -1,0 +1,46 @@
+/* 디자인 토큰. figdora "해커톤 캔버스"의 토큰 이름을 그대로 따른다.
+   컴포넌트 CSS에서는 색·폰트·모서리 값을 직접 쓰지 말고 이 변수만 쓴다. */
+:root {
+  /* 잉크 단계 */
+  --color-ink: #171717;
+  --color-body: #4d4d4d;
+  --color-mute: #8f8f8f;
+  --color-faint: #a1a1a1;
+
+  /* 면과 선 */
+  --color-canvas: #fafafa;
+  --color-surface: #ffffff;
+  --color-hairline: #ebebeb;
+  --color-hairline-soft: #f2f2f2;
+
+  /* 상태 색: 상태를 나타낼 때만 쓴다. 항상 텍스트와 함께 쓴다. */
+  --color-link: #0070f3;
+  --color-link-soft: #d3e5ff;
+  --color-error: #ee0000;
+  --color-error-soft: #fff0f0;
+  --color-warning: #f5a623;
+  --color-warning-deep: #ab570a;
+  --color-warning-soft: #ffefcf;
+  --color-success: #0a8a4a;
+  --color-success-soft: #e6f6ec;
+  --color-highlight: #fff8e1;
+
+  /* 폰트: 모노는 코드·경로·커밋·HTTP 코드에만 */
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo',
+    'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* 모서리 */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-pill: 999px;
+
+  /* 레이아웃 */
+  --header-height: 56px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --header-height: 52px;
+  }
+}
