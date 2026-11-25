@@ -3,7 +3,7 @@ name: tracer-web
 # docker compose up -d --build
 #
 # 백엔드(tracer-backend) compose 가 먼저 떠 있어야 한다. 백엔드 네트워크에 붙어서 /api 를 api:3000 으로 넘긴다.
-# 공개 주소 https://hackathon.kangdora.me 는 Cloudflare 를 거쳐 이 서버의 localhost:9000 으로 들어온다.
+# 공개 주소 https://tracer.kangdora.me 는 Cloudflare 를 거쳐 이 서버의 localhost:9000 으로 들어온다.
 
 services:
   web:
@@ -13,7 +13,7 @@ services:
       - "127.0.0.1:${WEB_HOST_PORT:-9000}:80"
     environment:
       API_UPSTREAM: ${API_UPSTREAM:-http://api:3000}
-      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-https://hackathon.kangdora.me}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-https://tracer.kangdora.me}
     networks:
       - backend
     restart: unless-stopped

@@ -3,7 +3,7 @@
 외부 서비스 장애 지도: 공개 GitHub 저장소가 쓰는 외부 서비스의 공개 상태와 코드의 호출 위치를 한 화면에서 보여주는 웹 프론트엔드.
 
 - 백엔드: [tracer-backend](https://github.com/Imaginationer-Lab/tracer-backend)
-- 배포 주소: https://hackathon.kangdora.me
+- 배포 주소: https://tracer.kangdora.me
 
 ## 개발
 
@@ -34,7 +34,7 @@ docker compose up -d --build   # 127.0.0.1:9000
 | --- | --- | --- |
 | `WEB_HOST_PORT` | `9000` | 호스트에서 여는 포트 (`127.0.0.1`에만 묶임) |
 | `API_UPSTREAM` | `http://api:3000` | `/api`를 넘길 백엔드 주소 |
-| `PUBLIC_ORIGIN` | `https://hackathon.kangdora.me` | 이 출처에서 온 요청은 `Origin`을 지우고 넘긴다 (같은 출처라 백엔드 CORS 설정이 필요 없음) |
+| `PUBLIC_ORIGIN` | `https://tracer.kangdora.me` | 이 출처에서 온 요청은 `Origin`을 지우고 넘긴다 (같은 출처라 백엔드 CORS 설정이 필요 없음) |
 | `BACKEND_NETWORK` | `outage-map_default` | 붙을 백엔드 compose 네트워크 |
 
 요청 경로가 브라우저 → Cloudflare → 프론트(nginx) → 백엔드이므로 백엔드 `TRUST_PROXY`는 `2`다.
