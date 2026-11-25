@@ -1,0 +1,66 @@
+import type { SkipReason } from '../../../api/contract'
+import { Icon } from '../../../components/icons/Icon'
+import type { FileTreeNode } from '../../../lib/fileTree'
+import styles from './FileTreeRows.module.css'
+
+const SKIP_REASON_LABELS: Record<SkipReason, string> = {
+  'too-large': '용량이 커서 건너뛰었어요',
+  minified: '압축된 코드라 건너뛰었어요',
+  'parse-error': '코드를 해석하지 못해 건너뛰었어요',
+}
+
+interface FileTreeRowsProps {
+  nodes: FileTreeNode[]
+  depth: number
+  expanded: ReadonlySet<string>
+  onToggle: (path: string) => void
+}
+
+/** 폴더는 펼치고 접을 수 있고, 펼친 폴더의 자식만 그린다 */
+export function FileTreeRows({ nodes, depth, expanded, onToggle }: FileTreeRowsProps) {
+  const indent = { paddingLeft: 12 + depth * 16 }
+
+  return (
+    <>
+      {nodes.map((node) => {
+        if (node.kind === 'dir') {
+          const open = expanded.has(node.path)
+          return (
+            <li key={node.path}>
+              <button type="button" className={styles.row} style={indent} onClick={() => onToggle(node.path)} aria-expanded={open}>
+                <Icon name={open ? 'chevronDown' : 'chevronRight'} size={12} className={styles.chevron} />
+                <Icon name="folder" size={14} className={styles.icon} />
+                <span className={styles.name}>{node.name}</span>
+              </button>
+              {open && (
+                <ul>
+                  <FileTreeRows nodes={node.children} depth={depth + 1} expanded={expanded} onToggle={onToggle} />
+                </ul>
+              )}
+            </li>
+          )
+        }
+
+        const { entry } = node
+        const skipped = entry.state === 'skipped'
+        return (
+          <li key={node.path}>
+            <div className={styles.row} style={indent} data-skipped={skipped || undefined}>
+              <span className={styles.spacer} aria-hidden="true" />
+              <Icon name="file" size={14} className={styles.icon} />
+              <span className={styles.name}>{node.name}</span>
+              {skipped && (
+                <span className={styles.skip} tabIndex={0} aria-describedby={`skip-${node.path}`}>
+                  읽기 실패
+                  <span id={`skip-${node.path}`} role="tooltip" className={styles.tooltip}>
+                    {SKIP_REASON_LABELS[entry.reason]}
+                  </span>
+                </span>
+              )}
+            </div>
+          </li>
+        )
+      })}
+    </>
+  )
+}

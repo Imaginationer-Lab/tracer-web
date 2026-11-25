@@ -1,0 +1,52 @@
+.pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.dot,
+.hollow {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+
+.dot {
+  background: currentColor;
+}
+
+.hollow {
+  border: 1.5px solid currentColor;
+}
+
+.success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.warning {
+  background: var(--color-warning-soft);
+  color: var(--color-warning-deep);
+}
+
+.error {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+}
+
+.info {
+  background: var(--color-link-soft);
+  color: var(--color-link);
+}
+
+.neutral {
+  background: var(--color-hairline-soft);
+  color: var(--color-body);
+}

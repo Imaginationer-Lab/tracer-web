@@ -1,0 +1,84 @@
+.card {
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--color-hairline);
+  background: none;
+  text-align: left;
+  cursor: default;
+
+  @media (max-width: 640px) {
+    cursor: pointer;
+  }
+}
+
+.title {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+
+  @media (max-width: 640px) {
+    flex: none;
+  }
+}
+
+/* 아이콘과 접기 표시는 모바일에서만 */
+.titleIcon,
+.toggleIcon {
+  display: none;
+  color: var(--color-mute);
+
+  @media (max-width: 640px) {
+    display: block;
+  }
+}
+
+.toggleIcon {
+  margin-left: auto;
+  color: var(--color-faint);
+  transition: transform 120ms ease;
+}
+
+.caption {
+  color: var(--color-mute);
+  font-size: 12px;
+
+  &[data-warning] {
+    color: var(--color-warning-deep);
+    font-weight: 500;
+  }
+}
+
+.tree {
+  flex: 1;
+  min-height: 0;
+  padding: 8px 0;
+  overflow: auto;
+}
+
+@media (max-width: 640px) {
+  .card[data-mobile-open='false'] {
+    .header {
+      border-bottom: 0;
+    }
+
+    .tree {
+      display: none;
+    }
+  }
+
+  .card[data-mobile-open='true'] .toggleIcon {
+    transform: rotate(180deg);
+  }
+}
