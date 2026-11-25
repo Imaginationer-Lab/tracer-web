@@ -1,0 +1,77 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-hairline);
+  border-left: 3px solid var(--color-error);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+
+  @media (max-width: 640px) {
+    padding: 12px 14px;
+  }
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.icon {
+  color: var(--color-error);
+}
+
+/* 실제 상태 배지(꽉 찬 배지)와 구분되는 점선 배지 */
+.badge {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border: 1px dashed var(--color-mute);
+  border-radius: 4px;
+  color: var(--color-body);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  color: var(--color-mute);
+  font-size: 12px;
+}
+
+.status {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.note {
+  color: var(--color-mute);
+  font-size: 12px;
+}
+
+.noMatch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--color-hairline-soft);
+  color: var(--color-body);
+  font-size: 13px;
+}
+
+.infoIcon {
+  color: var(--color-mute);
+}

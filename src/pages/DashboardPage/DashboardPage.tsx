@@ -8,7 +8,11 @@ import { useAnalysis } from '../../hooks/useAnalysis'
 import { MOBILE_QUERY, useMediaQuery } from '../../hooks/useMediaQuery'
 import { useProviderDetail } from '../../hooks/useProviderDetail'
 import { useProviderStatuses } from '../../hooks/useProviderStatuses'
+import { useDemoEvent } from '../../hooks/useDemoEvent'
+import { buildResponseGuide } from '../../lib/responseGuide'
 import { DashboardError, DashboardLoading } from './components/DashboardMessage'
+import { DemoEventArea } from './components/DemoEventArea'
+import { DemoToggle } from './components/DemoToggle'
 import { EvidencePanel } from './components/EvidencePanel'
 import { EvidencePlaceholder } from './components/EvidencePlaceholder'
 import { FileTreeCard } from './components/FileTreeCard'
@@ -16,7 +20,9 @@ import { NoProvidersState } from './components/NoProvidersState'
 import { ProviderDetailMobile } from './components/ProviderDetailMobile'
 import { ProviderList } from './components/ProviderList'
 import { RepoInfo } from './components/RepoInfo'
+import { ResponseGuide } from './components/ResponseGuide'
 import styles from './DashboardPage.module.css'
+import { useDemoMode } from './useDemoMode'
 import { useProviderSelection } from './useProviderSelection'
 
 const NO_PROVIDERS: AnalysisResult['providers'] = []
@@ -36,6 +42,18 @@ export function DashboardPage() {
   const { statuses, refetch } = useProviderStatuses(providers)
   const { selected, select, backToList } = useProviderSelection(providers, isMobile)
   const detail = useProviderDetail(analysisId, selected?.id)
+  const demo = useDemoMode()
+  const demoLoad = useDemoEvent(demo.enabled && result !== null)
+  const event = demoLoad.phase === 'loaded' ? demoLoad.event : null
+
+  // 대응 가이드: 재현 중이고, 이벤트의 공급자를 골랐고, 근거를 불러왔을 때만
+  const guide =
+    event && selected?.id === event.providerId && detail.load.phase === 'loaded' ? (
+      <ResponseGuide guide={buildResponseGuide(event, selected, detail.load.detail)} />
+    ) : null
+  const demoArea = <DemoEventArea load={demoLoad} providers={providers} onTurnOff={() => demo.setEnabled(false)} />
+  const demoToggle = (variant: 'header' | 'bar') =>
+    result && <DemoToggle enabled={demo.enabled} onChange={demo.setEnabled} variant={variant} />
 
   // 모바일에서 공급자를 고르면 목록 대신 상세 화면
   if (isMobile && selected && result) {
@@ -46,6 +64,8 @@ export function DashboardPage() {
         detailLoad={detail.load}
         onRetryDetail={detail.retry}
         onBack={backToList}
+        demoEvent={event?.providerId === selected.id ? demoArea : null}
+        guide={guide}
       />
     )
   }
@@ -64,15 +84,19 @@ export function DashboardPage() {
           )
         }
         trailing={
-          <Button variant="ghost" size="sm" onClick={analyzeOther}>
-            <span className={styles.desktopOnly}>다른 저장소 분석</span>
-            <span className={styles.mobileOnly}>다른 저장소</span>
-          </Button>
+          <>
+            {demoToggle('header')}
+            <Button variant="ghost" size="sm" onClick={analyzeOther}>
+              <span className={styles.desktopOnly}>다른 저장소 분석</span>
+              <span className={styles.mobileOnly}>다른 저장소</span>
+            </Button>
+          </>
         }
       />
       {analysis && (
         <div className={styles.repoBar}>
           <RepoInfo repo={analysis.repo} />
+          {demoToggle('bar')}
         </div>
       )}
 
@@ -86,11 +110,13 @@ export function DashboardPage() {
       {load.phase === 'done' && result && providers.length > 0 && (
         <main className={styles.body}>
           <div className={styles.left}>
+            {demoArea}
             <SkippedAlert analysis={load.analysis} />
             <ProviderList
               providers={providers}
               statuses={statuses}
               selectedId={selected?.id}
+              replay={event ? { providerId: event.providerId, httpStatus: event.httpStatus } : undefined}
               onSelect={select}
               onRetryStatus={refetch}
             />
@@ -104,6 +130,7 @@ export function DashboardPage() {
                 provider={selected}
                 load={detail.load}
                 onRetry={detail.retry}
+                footer={guide}
                 className={styles.evidence}
               />
             ) : (

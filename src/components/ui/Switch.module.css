@@ -1,0 +1,51 @@
+.switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-hairline);
+  transition: background-color 150ms ease;
+
+  &[aria-checked='true'] {
+    background: var(--color-ink);
+  }
+}
+
+.thumb {
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  transition: transform 150ms ease;
+}
+
+/* 데스크톱 헤더: 36 × 20 */
+.md {
+  width: 36px;
+  height: 20px;
+
+  .thumb {
+    width: 16px;
+    height: 16px;
+  }
+
+  &[aria-checked='true'] .thumb {
+    transform: translateX(16px);
+  }
+}
+
+/* 모바일: 44 × 24 (터치 영역) */
+.lg {
+  width: 44px;
+  height: 24px;
+
+  .thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  &[aria-checked='true'] .thumb {
+    transform: translateX(20px);
+  }
+}
