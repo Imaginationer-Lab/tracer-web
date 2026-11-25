@@ -55,6 +55,22 @@
   }
 }
 
+.feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.support {
+  color: var(--color-faint);
+  font-size: 13px;
+  line-height: 18px;
+
+  @media (max-width: 640px) {
+    font-size: 12px;
+  }
+}
+
 .description {
   color: var(--color-body);
   font-size: 16px;

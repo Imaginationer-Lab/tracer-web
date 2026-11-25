@@ -1,0 +1,67 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+
+  @media (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-body);
+  font-size: 13px;
+
+  &[data-state='pending'] {
+    color: var(--color-faint);
+  }
+
+  &[data-state='running'] {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+
+  &[data-state='failed'] {
+    color: var(--color-error);
+    font-weight: 500;
+  }
+}
+
+.done {
+  color: var(--color-success);
+}
+
+.running {
+  color: var(--color-ink);
+}
+
+.failedIcon {
+  color: var(--color-error);
+}
+
+/* 아이콘(14px) 칸 가운데에 6px 점 */
+.dot {
+  width: 6px;
+  height: 6px;
+  margin: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-faint);
+}
