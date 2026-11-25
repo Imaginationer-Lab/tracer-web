@@ -1,9 +1,7 @@
-// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 2893ba6).
+// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 f71c2f5, 브랜치 feat/selective-fetch).
 // 직접 고치지 말고, 백엔드가 바뀌면 다시 복사한다. 명세: tracer-backend docs/frontend-handoff.md
-// 임시: AI 탐지 전환 부분(ProviderId · ProviderCategory · otherServices · DETECTION_UNAVAILABLE)은
-// 백엔드 예고 문서 api-change-ai-detection.md(2026-11-25)의 타입을 먼저 옮겼다. 백엔드 구현이 나오면 다시 복사한다.
 
-/** 서비스 id. 소문자·숫자·하이픈. supabase · stripe · aws-s3 는 지금과 같다 */
+/** 서비스 id. 소문자·숫자·하이픈 (예: supabase, stripe, aws-s3, toss-payments). 탐지되는 서비스는 고정되어 있지 않다 */
 export type ProviderId = string;
 
 export type StepKey = 'repo' | 'files' | 'detect';
@@ -32,8 +30,8 @@ export type ErrorCode =
   | 'ORIGIN_NOT_ALLOWED'
   | 'BAD_REQUEST'
   | 'NOT_FOUND'
-  | 'INTERNAL_ERROR'
-  | 'DETECTION_UNAVAILABLE'; // 503, retryable: AI 판단 실패 (분석은 status: 'failed', error에 담김)
+  | 'DETECTION_UNAVAILABLE'
+  | 'INTERNAL_ERROR';
 
 export interface ApiError {
   code: ErrorCode;
@@ -45,22 +43,13 @@ export interface ApiError {
   retryAfter?: number;
 }
 
-/** 아이콘·색 고르기용. 모르는 값이 오면 'other'로 취급한다 */
-export type ProviderCategory =
-  | 'auth'        // 로그인·인증
-  | 'payment'     // 결제
-  | 'storage'     // 파일 저장·업로드
-  | 'database'    // 데이터베이스·BaaS
-  | 'ai'          // AI 모델·검색 API
-  | 'messaging'   // 메일·SMS·푸시 알림·채팅
-  | 'monitoring'  // 에러 추적·로그
-  | 'analytics'   // 사용자 분석·광고
-  | 'other';      // 지도, 외부 데이터 API 등
+/** 기계가 읽는 서비스 분류 (role은 화면용 한국어 라벨). 나중에 늘 수 있으니 모르는 값은 'other'로 취급한다 */
+export type ProviderCategory = 'auth' | 'payment' | 'storage' | 'database' | 'ai' | 'messaging' | 'monitoring' | 'analytics' | 'other';
 
 export interface ProviderSummary {
   id: ProviderId;
   name: string;
-  /** AI가 붙인 짧은 한국어 라벨 (예: 결제, 에러 모니터링, AI 모델 호출) */
+  /** 화면용 한국어 라벨 (예: 로그인, 결제, 파일 업로드, 에러 모니터링). 알려진 서비스가 아니면 AI가 붙인다 */
   role: string;
   category: ProviderCategory;
   fileCount: number;
@@ -79,10 +68,10 @@ export type FileEntry =
   | { path: string; state: 'other' };
 
 export interface AnalysisResult {
-  /** 모든 외부 서비스. 순서: Supabase → Stripe → Amazon S3 → 근거 파일이 많은 순 → 이름순 */
+  /** 탐지된 모든 외부 서비스. Supabase → Stripe → Amazon S3 → 나머지는 근거 파일이 많은 순 → 이름순 */
   providers: ProviderSummary[];
-  /** @deprecated 항상 []. 다음 변경 때 지운다 */
-  otherServices: [];
+  /** @deprecated 항상 []. 모든 서비스가 providers로 들어간다. 다음 변경 때 지운다 */
+  otherServices: never[];
   files: FileEntry[];
   summary: { analyzed: number; skipped: number };
 }
