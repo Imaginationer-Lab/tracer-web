@@ -10,6 +10,7 @@ import { MOBILE_QUERY, useMediaQuery } from '../../hooks/useMediaQuery'
 import { useProviderDetail } from '../../hooks/useProviderDetail'
 import { useProviderStatuses } from '../../hooks/useProviderStatuses'
 import { useDemoEvent } from '../../hooks/useDemoEvent'
+import { isExampleRepo } from '../../lib/exampleRepo'
 import { buildResponseGuide } from '../../lib/responseGuide'
 import { DashboardError, DashboardLoading } from './components/DashboardMessage'
 import { DemoEventArea } from './components/DemoEventArea'
@@ -56,8 +57,10 @@ export function DashboardPage() {
     if (selectedOther) return { key: `other:${selectedOther.name}`, label: selectedOther.name, files: selectedOther.files }
     return undefined
   }, [selected, selectedOther])
+  // 데모 재현은 시연용 장치라 공개 예제 저장소에서만 쓴다 (다른 저장소에서는 ?demo=1 이 있어도 무시)
+  const isExample = analysis !== null && isExampleRepo(analysis.repo)
   const demo = useDemoMode()
-  const demoLoad = useDemoEvent(demo.enabled && result !== null)
+  const demoLoad = useDemoEvent(demo.enabled && isExample && result !== null)
   const event = demoLoad.phase === 'loaded' ? demoLoad.event : null
 
   // 대응 가이드: 재현 중이고, 이벤트의 공급자를 골랐고, 근거를 불러왔을 때만
@@ -67,7 +70,7 @@ export function DashboardPage() {
     ) : null
   const demoArea = <DemoEventArea load={demoLoad} providers={providers} onTurnOff={() => demo.setEnabled(false)} />
   const demoToggle = (variant: 'header' | 'bar') =>
-    result && <DemoToggle enabled={demo.enabled} onChange={demo.setEnabled} variant={variant} />
+    result && isExample && <DemoToggle enabled={demo.enabled} onChange={demo.setEnabled} variant={variant} />
 
   // 모바일에서 공급자·서비스를 고르면 목록 대신 상세 화면
   if (isMobile && selectedOther && result) {
