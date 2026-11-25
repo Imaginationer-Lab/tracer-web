@@ -1,7 +1,8 @@
-// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 2893ba6).
+// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 f71c2f5, 브랜치 feat/selective-fetch).
 // 직접 고치지 말고, 백엔드가 바뀌면 다시 복사한다. 명세: tracer-backend docs/frontend-handoff.md
 
-export type ProviderId = 'supabase' | 'stripe' | 'aws-s3';
+/** 서비스 id. 소문자·숫자·하이픈 (예: supabase, stripe, aws-s3, toss-payments). 탐지되는 서비스는 고정되어 있지 않다 */
+export type ProviderId = string;
 
 export type StepKey = 'repo' | 'files' | 'detect';
 export type StepState = 'pending' | 'running' | 'done' | 'failed';
@@ -29,6 +30,7 @@ export type ErrorCode =
   | 'ORIGIN_NOT_ALLOWED'
   | 'BAD_REQUEST'
   | 'NOT_FOUND'
+  | 'DETECTION_UNAVAILABLE'
   | 'INTERNAL_ERROR';
 
 export interface ApiError {
@@ -41,13 +43,13 @@ export interface ApiError {
   retryAfter?: number;
 }
 
-/** 기계가 읽는 공급자 역할 분류 (role은 화면용 한국어 라벨) */
-export type ProviderCategory = 'auth' | 'payment' | 'storage' | 'database';
+/** 기계가 읽는 서비스 분류 (role은 화면용 한국어 라벨). 나중에 늘 수 있으니 모르는 값은 'other'로 취급한다 */
+export type ProviderCategory = 'auth' | 'payment' | 'storage' | 'database' | 'ai' | 'messaging' | 'monitoring' | 'analytics' | 'other';
 
 export interface ProviderSummary {
   id: ProviderId;
   name: string;
-  /** 화면용 한국어 라벨: 로그인 · 결제 · 파일 업로드 · 데이터베이스 · 파일 저장 */
+  /** 화면용 한국어 라벨 (예: 로그인, 결제, 파일 업로드, 에러 모니터링). 알려진 서비스가 아니면 AI가 붙인다 */
   role: string;
   category: ProviderCategory;
   fileCount: number;
@@ -65,20 +67,11 @@ export type FileEntry =
   | { path: string; state: 'skipped'; reason: SkipReason }
   | { path: string; state: 'other' };
 
-/** 세 공급자 밖에서 찾은 외부 서비스. 규칙으로 못 푼 단서를 AI(Claude)가 판단한 결과라 상태 연동·근거 상세는 없다 */
-export interface OtherServiceSummary {
-  /** 서비스 이름 (예: SendGrid, Kakao Maps) */
-  name: string;
-  /** 판단 재료: host, 패키지 이름, 호출식 */
-  clues: string[];
-  fileCount: number;
-  files: { path: string; line: number }[];
-}
-
 export interface AnalysisResult {
+  /** 탐지된 모든 외부 서비스. Supabase → Stripe → Amazon S3 → 나머지는 근거 파일이 많은 순 → 이름순 */
   providers: ProviderSummary[];
-  /** AI 판단이 꺼져 있거나 찾은 게 없으면 빈 배열 */
-  otherServices: OtherServiceSummary[];
+  /** @deprecated 항상 []. 모든 서비스가 providers로 들어간다. 다음 변경 때 지운다 */
+  otherServices: never[];
   files: FileEntry[];
   summary: { analyzed: number; skipped: number };
 }

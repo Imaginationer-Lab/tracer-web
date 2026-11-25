@@ -19,9 +19,6 @@ import { EvidencePanel } from './components/EvidencePanel'
 import { EvidencePlaceholder } from './components/EvidencePlaceholder'
 import { FileTreeCard, type FileHighlight } from './components/FileTreeCard'
 import { NoProvidersState } from './components/NoProvidersState'
-import { OtherServiceDetailMobile } from './components/OtherServiceDetailMobile'
-import { OtherServiceList } from './components/OtherServiceList'
-import { OtherServicePanel } from './components/OtherServicePanel'
 import { ProviderDetailMobile } from './components/ProviderDetailMobile'
 import { ProviderList } from './components/ProviderList'
 import { RepoInfo } from './components/RepoInfo'
@@ -31,7 +28,6 @@ import { useDemoMode } from './useDemoMode'
 import { useProviderSelection } from './useProviderSelection'
 
 const NO_PROVIDERS: AnalysisResult['providers'] = []
-const NO_OTHERS: AnalysisResult['otherServices'] = []
 
 /** SCR-002 분석 대시보드 */
 export function DashboardPage() {
@@ -44,19 +40,14 @@ export function DashboardPage() {
   const analysis = load.phase === 'error' ? null : load.analysis
   const result = load.phase === 'done' ? load.analysis.result : null
   const providers = result?.providers ?? NO_PROVIDERS
-  // 예전 백엔드 응답에는 otherServices가 없을 수 있다
-  const others = result?.otherServices ?? NO_OTHERS
 
   const { statuses, refetch } = useProviderStatuses(providers)
-  const { selection, selectProvider, selectOther, backToList } = useProviderSelection(providers, others, isMobile)
-  const selected = selection?.kind === 'provider' ? selection.provider : undefined
-  const selectedOther = selection?.kind === 'other' ? selection.service : undefined
+  const { selected, selectProvider, backToList } = useProviderSelection(providers, isMobile)
   const detail = useProviderDetail(analysisId, selected?.id)
-  const highlight = useMemo<FileHighlight | undefined>(() => {
-    if (selected) return { key: `provider:${selected.id}`, label: selected.name, files: selected.files }
-    if (selectedOther) return { key: `other:${selectedOther.name}`, label: selectedOther.name, files: selectedOther.files }
-    return undefined
-  }, [selected, selectedOther])
+  const highlight = useMemo<FileHighlight | undefined>(
+    () => (selected ? { key: `provider:${selected.id}`, label: selected.name, files: selected.files } : undefined),
+    [selected],
+  )
   // 데모 재현은 시연용 장치라 공개 예제 저장소에서만 쓴다 (다른 저장소에서는 ?demo=1 이 있어도 무시)
   const isExample = analysis !== null && isExampleRepo(analysis.repo)
   const demo = useDemoMode()
@@ -72,10 +63,7 @@ export function DashboardPage() {
   const demoToggle = (variant: 'header' | 'bar') =>
     result && isExample && <DemoToggle enabled={demo.enabled} onChange={demo.setEnabled} variant={variant} />
 
-  // 모바일에서 공급자·서비스를 고르면 목록 대신 상세 화면
-  if (isMobile && selectedOther && result) {
-    return <OtherServiceDetailMobile service={selectedOther} onBack={backToList} />
-  }
+  // 모바일에서 서비스를 고르면 목록 대신 상세 화면
   if (isMobile && selected && result) {
     return (
       <ProviderDetailMobile
@@ -122,27 +110,24 @@ export function DashboardPage() {
 
       {load.phase === 'loading' && <DashboardLoading />}
       {load.phase === 'error' && <DashboardError error={load.error} onAnalyzeOther={analyzeOther} />}
-      {load.phase === 'done' && result && providers.length === 0 && others.length === 0 && (
+      {load.phase === 'done' && result && providers.length === 0 && (
         <main className={styles.centered}>
           <NoProvidersState analysis={load.analysis} onAnalyzeOther={analyzeOther} />
         </main>
       )}
-      {load.phase === 'done' && result && (providers.length > 0 || others.length > 0) && (
+      {load.phase === 'done' && result && providers.length > 0 && (
         <main className={styles.body}>
           <div className={styles.left}>
             {demoArea}
             <SkippedAlert analysis={load.analysis} />
-            {providers.length > 0 && (
-              <ProviderList
-                providers={providers}
-                statuses={statuses}
-                selectedId={selected?.id}
-                replay={event ? { providerId: event.providerId, httpStatus: event.httpStatus } : undefined}
-                onSelect={selectProvider}
-                onRetryStatus={refetch}
-              />
-            )}
-            <OtherServiceList services={others} selectedName={selectedOther?.name} onSelect={selectOther} />
+            <ProviderList
+              providers={providers}
+              statuses={statuses}
+              selectedId={selected?.id}
+              replay={event ? { providerId: event.providerId, httpStatus: event.httpStatus } : undefined}
+              onSelect={selectProvider}
+              onRetryStatus={refetch}
+            />
             <p className={styles.mobileHint}>서비스를 누르면 근거 파일과 코드를 볼 수 있어요.</p>
           </div>
           <div className={styles.right}>
@@ -156,8 +141,6 @@ export function DashboardPage() {
                 footer={guide}
                 className={styles.evidence}
               />
-            ) : selectedOther ? (
-              <OtherServicePanel key={selectedOther.name} service={selectedOther} className={styles.evidence} />
             ) : (
               <EvidencePlaceholder className={styles.placeholder} />
             )}
