@@ -12,6 +12,7 @@ import { useProviderStatuses } from '../../hooks/useProviderStatuses'
 import { useDemoEvent } from '../../hooks/useDemoEvent'
 import { isExampleRepo } from '../../lib/exampleRepo'
 import { buildResponseGuide } from '../../lib/responseGuide'
+import { findSameCategory, type SameCategory } from '../../lib/sameCategory'
 import { DashboardError, DashboardLoading } from './components/DashboardMessage'
 import { DemoEventArea } from './components/DemoEventArea'
 import { DemoToggle } from './components/DemoToggle'
@@ -23,6 +24,7 @@ import { ProviderDetailMobile } from './components/ProviderDetailMobile'
 import { ProviderList } from './components/ProviderList'
 import { RepoInfo } from './components/RepoInfo'
 import { ResponseGuide } from './components/ResponseGuide'
+import { SameCategoryNote } from './components/SameCategoryNote'
 import styles from './DashboardPage.module.css'
 import { useDemoMode } from './useDemoMode'
 import { useProviderSelection } from './useProviderSelection'
@@ -44,10 +46,7 @@ export function DashboardPage() {
   const { statuses, refetch } = useProviderStatuses(providers)
   const { selected, selectProvider, backToList } = useProviderSelection(providers, isMobile)
   const detail = useProviderDetail(analysisId, selected?.id)
-  const highlight = useMemo<FileHighlight | undefined>(
-    () => (selected ? { key: `provider:${selected.id}`, label: selected.name, files: selected.files } : undefined),
-    [selected],
-  )
+  const same = useMemo(() => (selected ? findSameCategory(selected, providers) : null), [selected, providers])
   // 데모 재현은 시연용 장치라 공개 예제 저장소에서만 쓴다 (다른 저장소에서는 ?demo=1 이 있어도 무시)
   const isExample = analysis !== null && isExampleRepo(analysis.repo)
   const demo = useDemoMode()
@@ -55,10 +54,18 @@ export function DashboardPage() {
   const event = demoLoad.phase === 'loaded' ? demoLoad.event : null
 
   // 대응 가이드: 재현 중이고, 이벤트의 공급자를 골랐고, 근거를 불러왔을 때만
+  const guideShown = Boolean(event && selected?.id === event.providerId && detail.load.phase === 'loaded')
   const guide =
-    event && selected?.id === event.providerId && detail.load.phase === 'loaded' ? (
-      <ResponseGuide guide={buildResponseGuide(event, selected, detail.load.detail)} />
+    guideShown && event && selected && detail.load.phase === 'loaded' ? (
+      <ResponseGuide guide={buildResponseGuide(event, selected, detail.load.detail, same)} />
     ) : null
+  const highlight = useMemo<FileHighlight | undefined>(() => {
+    if (!selected) return undefined
+    // 가이드가 같은 분류 서비스를 검토 항목으로 꺼냈을 때만 트리에도 그 파일을 보조 표시한다
+    const marks = guideShown && same ? sameCategoryMarks(same) : undefined
+    return { key: `provider:${selected.id}${marks ? ':guide' : ''}`, label: selected.name, files: selected.files, marks }
+  }, [selected, same, guideShown])
+  const sameNote = same && <SameCategoryNote same={same} onSelect={selectProvider} />
   const demoArea = <DemoEventArea load={demoLoad} providers={providers} onTurnOff={() => demo.setEnabled(false)} />
   const demoToggle = (variant: 'header' | 'bar') =>
     result && isExample && <DemoToggle enabled={demo.enabled} onChange={demo.setEnabled} variant={variant} />
@@ -73,6 +80,7 @@ export function DashboardPage() {
         onRetryDetail={detail.retry}
         onBack={backToList}
         demoEvent={event?.providerId === selected.id ? demoArea : null}
+        sameCategory={sameNote}
         guide={guide}
       />
     )
@@ -138,7 +146,12 @@ export function DashboardPage() {
                 provider={selected}
                 load={detail.load}
                 onRetry={detail.retry}
-                footer={guide}
+                footer={
+                  <>
+                    {sameNote}
+                    {guide}
+                  </>
+                }
                 className={styles.evidence}
               />
             ) : (
@@ -148,6 +161,12 @@ export function DashboardPage() {
         </main>
       )}
     </div>
+  )
+}
+
+function sameCategoryMarks(same: SameCategory) {
+  return same.services.flatMap((service) =>
+    service.files.map((file) => ({ path: file.path, label: `같은 분류 · ${file.line}행` })),
   )
 }
 

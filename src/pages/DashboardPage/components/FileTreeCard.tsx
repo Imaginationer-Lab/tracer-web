@@ -12,6 +12,8 @@ export interface FileHighlight {
   /** 머리글 문구에 쓰는 이름 (예: Stripe) */
   label: string
   files: { path: string; line: number }[]
+  /** 함께 보조 표시할 파일 (예: 대응 가이드의 같은 분류 서비스). 상위 폴더도 펼친다 */
+  marks?: { path: string; label: string }[]
 }
 
 interface FileTreeCardProps {
@@ -51,7 +53,12 @@ export function FileTreeCard({ result, highlight, className }: FileTreeCardProps
     () => new Map(highlight ? highlight.files.map((file) => [file.path, file.line] as const) : []),
     [highlight],
   )
-  const [expanded, setExpanded] = useState(() => withAncestorsOf(initialExpanded(result, tree), highlights.keys()))
+  const marks = useMemo(
+    () => new Map((highlight?.marks ?? []).map((mark) => [mark.path, mark.label] as const)),
+    [highlight],
+  )
+  const shownPaths = () => [...highlights.keys(), ...marks.keys()]
+  const [expanded, setExpanded] = useState(() => withAncestorsOf(initialExpanded(result, tree), shownPaths()))
   const [highlightedFor, setHighlightedFor] = useState(highlight?.key)
   const hasSkipped = result.summary.skipped > 0
   const [mobileOpen, setMobileOpen] = useState(hasSkipped)
@@ -60,7 +67,7 @@ export function FileTreeCard({ result, highlight, className }: FileTreeCardProps
   // 공급자를 바꾸면 새 근거 파일의 상위 폴더를 펼친다 (렌더 중 조정: 이전 선택과 다를 때만)
   if (highlightedFor !== highlight?.key) {
     setHighlightedFor(highlight?.key)
-    setExpanded((prev) => withAncestorsOf(prev, highlights.keys()))
+    setExpanded((prev) => withAncestorsOf(prev, shownPaths()))
   }
 
   // 첫 번째 강조 파일이 보이도록 스크롤 (DOM 조작만, 상태는 바꾸지 않음)
@@ -101,7 +108,7 @@ export function FileTreeCard({ result, highlight, className }: FileTreeCardProps
         <Icon name="chevronDown" size={16} className={styles.toggleIcon} />
       </button>
       <ul className={styles.tree} ref={treeRef}>
-        <FileTreeRows nodes={tree} depth={0} expanded={expanded} onToggle={toggle} highlights={highlights} />
+        <FileTreeRows nodes={tree} depth={0} expanded={expanded} onToggle={toggle} highlights={highlights} marks={marks} />
       </ul>
     </Card>
   )

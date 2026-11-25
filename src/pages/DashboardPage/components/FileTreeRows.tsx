@@ -16,10 +16,12 @@ interface FileTreeRowsProps {
   onToggle: (path: string) => void
   /** 강조할 파일 경로 → 근거 줄 번호 (선택한 공급자의 근거 파일) */
   highlights?: ReadonlyMap<string, number>
+  /** 보조 표시할 파일 경로 → 문구 (예: 같은 분류 · 2행). 강조보다 약하게 그린다 */
+  marks?: ReadonlyMap<string, string>
 }
 
 /** 폴더는 펼치고 접을 수 있고, 펼친 폴더의 자식만 그린다 */
-export function FileTreeRows({ nodes, depth, expanded, onToggle, highlights }: FileTreeRowsProps) {
+export function FileTreeRows({ nodes, depth, expanded, onToggle, highlights, marks }: FileTreeRowsProps) {
   const indent = { paddingLeft: 12 + depth * 16 }
 
   return (
@@ -42,6 +44,7 @@ export function FileTreeRows({ nodes, depth, expanded, onToggle, highlights }: F
                     expanded={expanded}
                     onToggle={onToggle}
                     highlights={highlights}
+                    marks={marks}
                   />
                 </ul>
               )}
@@ -53,6 +56,7 @@ export function FileTreeRows({ nodes, depth, expanded, onToggle, highlights }: F
         const skipped = entry.state === 'skipped'
         const highlightLine = highlights?.get(node.path)
         const highlighted = highlightLine !== undefined
+        const mark = highlighted ? undefined : marks?.get(node.path)
         return (
           <li key={node.path}>
             <div
@@ -60,11 +64,13 @@ export function FileTreeRows({ nodes, depth, expanded, onToggle, highlights }: F
               style={indent}
               data-skipped={skipped || undefined}
               data-highlighted={highlighted || undefined}
+              data-marked={mark !== undefined || undefined}
             >
               <span className={styles.spacer} aria-hidden="true" />
               <Icon name="file" size={14} className={styles.icon} />
               <span className={styles.name}>{node.name}</span>
               {highlighted && <span className={styles.related}>관련 파일 · {highlightLine}행</span>}
+              {mark && <span className={styles.mark}>{mark}</span>}
               {skipped && (
                 <span className={styles.skip} tabIndex={0} aria-describedby={`skip-${node.path}`}>
                   읽기 실패
