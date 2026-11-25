@@ -7,10 +7,12 @@ import { ProviderRow } from './ProviderRow'
 interface ProviderListProps {
   providers: ProviderSummary[]
   statuses: Partial<Record<ProviderId, ProviderStatusLoad>>
+  selectedId: ProviderId | undefined
+  onSelect: (providerId: ProviderId) => void
   onRetryStatus: (providerId: ProviderId) => void
 }
 
-export function ProviderList({ providers, statuses, onRetryStatus }: ProviderListProps) {
+export function ProviderList({ providers, statuses, selectedId, onSelect, onRetryStatus }: ProviderListProps) {
   return (
     <Card>
       <CardHeader title="탐지된 외부 서비스" aside={<span className={styles.count}>{providers.length}</span>} />
@@ -20,6 +22,8 @@ export function ProviderList({ providers, statuses, onRetryStatus }: ProviderLis
             key={provider.id}
             provider={provider}
             statusLoad={statuses[provider.id]}
+            selected={provider.id === selectedId}
+            onSelect={() => onSelect(provider.id)}
             onRetryStatus={() => onRetryStatus(provider.id)}
           />
         ))}

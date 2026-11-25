@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import type { AnalysisResult } from '../../../api/contract'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { AnalysisResult, ProviderSummary } from '../../../api/contract'
 import { Icon } from '../../../components/icons/Icon'
 import { Card } from '../../../components/ui/Card'
 import { ancestorPaths, buildFileTree, type FileTreeNode } from '../../../lib/fileTree'
@@ -8,6 +8,8 @@ import { FileTreeRows } from './FileTreeRows'
 
 interface FileTreeCardProps {
   result: AnalysisResult
+  /** 선택한 공급자. 근거 파일을 강조하고 상위 폴더를 펼친다 */
+  selected?: ProviderSummary
   className?: string
 }
 
@@ -25,15 +27,39 @@ function initialExpanded(result: AnalysisResult, tree: FileTreeNode[]): Set<stri
   return open
 }
 
+function withAncestorsOf(expanded: Set<string>, paths: Iterable<string>): Set<string> {
+  const next = new Set(expanded)
+  for (const path of paths) for (const dir of ancestorPaths(path)) next.add(dir)
+  return next
+}
+
 /**
  * 파일 트리. 데스크톱에서는 항상 펼쳐 두고, 모바일에서는 머리글을 눌러 접고 편다.
  * (모바일에서는 읽기 실패가 있을 때만 처음부터 펼친다)
  */
-export function FileTreeCard({ result, className }: FileTreeCardProps) {
+export function FileTreeCard({ result, selected, className }: FileTreeCardProps) {
   const tree = useMemo(() => buildFileTree(result.files), [result.files])
-  const [expanded, setExpanded] = useState(() => initialExpanded(result, tree))
+  const highlights = useMemo(
+    () => new Map(selected ? selected.files.map((file) => [file.path, file.line] as const) : []),
+    [selected],
+  )
+  const [expanded, setExpanded] = useState(() => withAncestorsOf(initialExpanded(result, tree), highlights.keys()))
+  const [highlightedFor, setHighlightedFor] = useState(selected?.id)
   const hasSkipped = result.summary.skipped > 0
   const [mobileOpen, setMobileOpen] = useState(hasSkipped)
+  const treeRef = useRef<HTMLUListElement>(null)
+
+  // 공급자를 바꾸면 새 근거 파일의 상위 폴더를 펼친다 (렌더 중 조정: 이전 선택과 다를 때만)
+  if (highlightedFor !== selected?.id) {
+    setHighlightedFor(selected?.id)
+    setExpanded((prev) => withAncestorsOf(prev, highlights.keys()))
+  }
+
+  // 첫 번째 강조 파일이 보이도록 스크롤 (DOM 조작만, 상태는 바꾸지 않음)
+  useEffect(() => {
+    if (!selected) return
+    treeRef.current?.querySelector('[data-highlighted]')?.scrollIntoView({ block: 'nearest' })
+  }, [selected])
 
   const toggle = (path: string) =>
     setExpanded((prev) => {
@@ -42,6 +68,12 @@ export function FileTreeCard({ result, className }: FileTreeCardProps) {
       else next.add(path)
       return next
     })
+
+  const caption = selected
+    ? `${selected.name} 관련 ${selected.files.length}개 강조`
+    : hasSkipped
+      ? `읽기 실패 ${result.summary.skipped}개`
+      : `분석한 파일 ${result.summary.analyzed}개`
 
   return (
     <Card className={[styles.card, className].filter(Boolean).join(' ')} data-mobile-open={mobileOpen}>
@@ -55,13 +87,13 @@ export function FileTreeCard({ result, className }: FileTreeCardProps) {
           <Icon name="folder" size={16} className={styles.titleIcon} />
           파일
         </span>
-        <span className={styles.caption} data-warning={hasSkipped || undefined}>
-          {hasSkipped ? `읽기 실패 ${result.summary.skipped}개` : `분석한 파일 ${result.summary.analyzed}개`}
+        <span className={styles.caption} data-warning={(!selected && hasSkipped) || undefined}>
+          {caption}
         </span>
         <Icon name="chevronDown" size={16} className={styles.toggleIcon} />
       </button>
-      <ul className={styles.tree}>
-        <FileTreeRows nodes={tree} depth={0} expanded={expanded} onToggle={toggle} />
+      <ul className={styles.tree} ref={treeRef}>
+        <FileTreeRows nodes={tree} depth={0} expanded={expanded} onToggle={toggle} highlights={highlights} />
       </ul>
     </Card>
   )

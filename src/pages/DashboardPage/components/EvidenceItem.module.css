@@ -1,0 +1,110 @@
+.item {
+  border-bottom: 1px solid var(--color-hairline);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* 경로 · (여기부터 확인하세요) · 근거 설명. 모바일에서는 근거 설명이 다음 줄로 */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  background: none;
+  text-align: left;
+
+  &:hover {
+    background: var(--color-hairline-soft);
+  }
+}
+
+.item[data-open] .head {
+  padding-bottom: 10px;
+
+  &:hover {
+    background: none;
+  }
+}
+
+.chevron {
+  color: var(--color-faint);
+}
+
+.path {
+  min-width: 0;
+  color: var(--color-body);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  word-break: break-all;
+
+  strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+}
+
+.line {
+  color: var(--color-mute);
+}
+
+.first {
+  @media (max-width: 640px) {
+    /* 모바일: 경로 다음 줄에 "여기부터 확인하세요 · 근거 설명"을 나란히 (펼침 표시만큼 들여서) */
+    margin-left: 20px;
+  }
+
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--color-hairline-soft);
+  color: var(--color-ink);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reason {
+  margin-left: auto;
+  color: var(--color-mute);
+  font-size: 12px;
+
+  @media (max-width: 640px) {
+    margin-left: 0;
+  }
+}
+
+/* 모바일: 경로가 한 줄을 다 쓰게 해서 칩·설명을 다음 줄로 보낸다 */
+.path {
+  @media (max-width: 640px) {
+    flex-basis: calc(100% - 20px);
+  }
+}
+
+/* 첫 항목이 아니면(칩 없음) 설명을 경로 아래에 들여서 */
+.chevron + .path + .reason {
+  @media (max-width: 640px) {
+    margin-left: 20px;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+.endpoint {
+  color: var(--color-mute);
+  font-size: 12px;
+
+  code {
+    margin-left: 6px;
+    color: var(--color-ink);
+    word-break: break-all;
+  }
+}

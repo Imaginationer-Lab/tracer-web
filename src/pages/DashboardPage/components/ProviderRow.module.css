@@ -1,12 +1,42 @@
 .row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
   border-bottom: 1px solid var(--color-hairline);
 
+  &:hover {
+    background: var(--color-canvas);
+  }
+
   @media (max-width: 640px) {
     padding: 14px 12px 14px 16px;
+  }
+}
+
+/* 선택한 공급자: 회색 바탕 + 왼쪽 잉크 막대 (aria-pressed 로 텍스트 상태도 전달) */
+.row[data-selected] {
+  background: var(--color-hairline-soft);
+  box-shadow: inset 2px 0 0 var(--color-ink);
+
+  /* 바탕과 같은 회색 배지가 묻히지 않게 흰 바탕 + 선 */
+  .pill {
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-hairline);
+  }
+}
+
+/* 행 전체를 덮는 투명 선택 버튼 */
+.select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: none;
+
+  &:focus-visible {
+    outline-offset: -2px;
   }
 }
 
@@ -70,6 +100,9 @@
 }
 
 .retry {
+  /* 선택 버튼 위에 올려서 따로 눌리게 */
+  position: relative;
+  z-index: 1;
   padding: 0;
   border: 0;
   background: none;

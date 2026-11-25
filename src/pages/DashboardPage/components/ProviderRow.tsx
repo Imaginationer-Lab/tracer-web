@@ -7,21 +7,33 @@ import styles from './ProviderRow.module.css'
 interface ProviderRowProps {
   provider: ProviderSummary
   statusLoad: ProviderStatusLoad | undefined
+  selected: boolean
+  onSelect: () => void
   onRetryStatus: () => void
 }
 
-export function ProviderRow({ provider, statusLoad, onRetryStatus }: ProviderRowProps) {
+/**
+ * 공급자 한 줄. 행 전체가 선택 버튼이고(겹쳐 놓은 투명 버튼), "다시 조회"는 그 위에 따로 눌린다.
+ */
+export function ProviderRow({ provider, statusLoad, selected, onSelect, onRetryStatus }: ProviderRowProps) {
   const status = describeProviderStatus(provider, statusLoad)
 
   return (
-    <li className={styles.row}>
+    <li className={styles.row} data-selected={selected || undefined}>
+      <button
+        type="button"
+        className={styles.select}
+        onClick={onSelect}
+        aria-pressed={selected}
+        aria-label={`${provider.name} ${provider.role} 근거 보기`}
+      />
       <div className={styles.main}>
         <div className={styles.top}>
           <span className={styles.name}>
             <strong>{provider.name}</strong>
             <span className={styles.role}>{provider.role}</span>
           </span>
-          <StatusPill label={status.label} tone={status.tone} marker={status.marker} />
+          <StatusPill label={status.label} tone={status.tone} marker={status.marker} className={styles.pill} />
         </div>
         <div className={styles.meta}>
           <span>
