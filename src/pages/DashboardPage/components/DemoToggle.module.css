@@ -1,0 +1,35 @@
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header {
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+
+.bar {
+  justify-content: space-between;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.header .title {
+  color: var(--color-body);
+}
+
+.description {
+  color: var(--color-mute);
+  font-size: 12px;
+}

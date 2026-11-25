@@ -8,6 +8,8 @@ interface ProviderRowProps {
   provider: ProviderSummary
   statusLoad: ProviderStatusLoad | undefined
   selected: boolean
+  /** 데모 재현 이벤트의 공급자면 그 HTTP 코드. 공개 상태 배지는 바꾸지 않고 문구·막대로만 표시한다 */
+  replayStatus?: number
   onSelect: () => void
   onRetryStatus: () => void
 }
@@ -15,11 +17,11 @@ interface ProviderRowProps {
 /**
  * 공급자 한 줄. 행 전체가 선택 버튼이고(겹쳐 놓은 투명 버튼), "다시 조회"는 그 위에 따로 눌린다.
  */
-export function ProviderRow({ provider, statusLoad, selected, onSelect, onRetryStatus }: ProviderRowProps) {
+export function ProviderRow({ provider, statusLoad, selected, replayStatus, onSelect, onRetryStatus }: ProviderRowProps) {
   const status = describeProviderStatus(provider, statusLoad)
 
   return (
-    <li className={styles.row} data-selected={selected || undefined}>
+    <li className={styles.row} data-selected={selected || undefined} data-replay={replayStatus !== undefined || undefined}>
       <button
         type="button"
         className={styles.select}
@@ -40,6 +42,7 @@ export function ProviderRow({ provider, statusLoad, selected, onSelect, onRetryS
             {provider.usage === 'declared-only' ? '의존성만 선언 · 호출 위치 못 찾음' : `근거 파일 ${provider.fileCount}개`}
           </span>
           <span className={styles.status}>
+            {replayStatus !== undefined && <span className={styles.replay}>데모 재현 HTTP {replayStatus} · </span>}
             {status.meta}
             {status.retryable && (
               <>

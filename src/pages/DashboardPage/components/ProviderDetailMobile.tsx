@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { ProviderSummary } from '../../../api/contract'
 import { Icon } from '../../../components/icons/Icon'
 import { StatusPill } from '../../../components/ui/StatusPill'
@@ -13,10 +14,22 @@ interface ProviderDetailMobileProps {
   detailLoad: ProviderDetailLoad
   onRetryDetail: () => void
   onBack: () => void
+  /** 데모 재현 이벤트 카드 (재현 중이고 이 공급자의 이벤트일 때) */
+  demoEvent?: ReactNode
+  /** 대응 가이드 (관련 파일 아래) */
+  guide?: ReactNode
 }
 
 /** 모바일: 목록에서 공급자를 누르면 열리는 상세 화면 (세로 스크롤) */
-export function ProviderDetailMobile({ provider, statusLoad, detailLoad, onRetryDetail, onBack }: ProviderDetailMobileProps) {
+export function ProviderDetailMobile({
+  provider,
+  statusLoad,
+  detailLoad,
+  onRetryDetail,
+  onBack,
+  demoEvent,
+  guide,
+}: ProviderDetailMobileProps) {
   const status = describeProviderStatus(provider, statusLoad)
 
   return (
@@ -38,12 +51,18 @@ export function ProviderDetailMobile({ provider, statusLoad, detailLoad, onRetry
             <span>{status.meta}</span>
           </div>
         </header>
+        {demoEvent}
         <EvidencePanel
           provider={provider}
           load={detailLoad}
           onRetry={onRetryDetail}
           title="근거"
-          footer={<RelatedFiles provider={provider} />}
+          footer={
+            <>
+              <RelatedFiles provider={provider} />
+              {guide}
+            </>
+          }
         />
       </main>
     </div>

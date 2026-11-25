@@ -1,0 +1,148 @@
+.guide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 16px 20px;
+  border-top: 1px solid var(--color-hairline);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.basisLabel {
+  color: var(--color-mute);
+  font-size: 12px;
+}
+
+.basis {
+  color: var(--color-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step {
+  display: flex;
+  gap: 10px;
+  color: var(--color-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.number {
+  flex-shrink: 0;
+  width: 12px;
+  color: var(--color-faint);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.stepBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.link {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* 코드에서 확인한 사실 */
+.fact {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--color-hairline-soft);
+  color: var(--color-ink);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.byStatus {
+  overflow: hidden;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-sm);
+}
+
+.byStatusTitle {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-hairline);
+  background: var(--color-canvas);
+  color: var(--color-body);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+
+  th,
+  td {
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  tr + tr {
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  th {
+    width: 72px;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  td {
+    color: var(--color-body);
+  }
+
+  tr[data-current] {
+    background: var(--color-highlight);
+
+    th {
+      font-weight: 600;
+    }
+  }
+}
+
+td.current {
+  width: 1%;
+  color: var(--color-ink);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
