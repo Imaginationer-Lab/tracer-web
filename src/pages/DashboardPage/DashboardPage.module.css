@@ -90,8 +90,11 @@
   gap: 16px;
   min-height: 0;
 
+  /* 좁은 데스크톱: 파일 트리 위, 근거 패널 아래로 나눠 쌓는다 */
   @media (max-width: 1024px) {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: minmax(0, 1fr);
   }
 
   @media (max-width: 640px) {
@@ -103,10 +106,31 @@
   min-height: 0;
 }
 
-/* 모바일에서는 공급자를 누르면 상세 화면으로 이동한다 (#4). 근거 패널 자리는 두지 않는다 */
 .evidence {
+  min-height: 0;
+
+  /* 모바일에서는 공급자를 누르면 상세 화면으로 이동하므로 패널을 두지 않는다 */
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+
+/* 선택 전 안내는 넓은 화면에서만 */
+.placeholder {
   @media (max-width: 1024px) {
     display: none;
+  }
+}
+
+.mobileHint {
+  display: none;
+
+  @media (max-width: 640px) {
+    display: block;
+    color: var(--color-mute);
+    font-size: 12px;
+    text-align: center;
+    order: 10;
   }
 }
 

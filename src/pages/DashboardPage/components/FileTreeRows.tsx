@@ -14,10 +14,12 @@ interface FileTreeRowsProps {
   depth: number
   expanded: ReadonlySet<string>
   onToggle: (path: string) => void
+  /** 강조할 파일 경로 → 근거 줄 번호 (선택한 공급자의 근거 파일) */
+  highlights?: ReadonlyMap<string, number>
 }
 
 /** 폴더는 펼치고 접을 수 있고, 펼친 폴더의 자식만 그린다 */
-export function FileTreeRows({ nodes, depth, expanded, onToggle }: FileTreeRowsProps) {
+export function FileTreeRows({ nodes, depth, expanded, onToggle, highlights }: FileTreeRowsProps) {
   const indent = { paddingLeft: 12 + depth * 16 }
 
   return (
@@ -34,7 +36,13 @@ export function FileTreeRows({ nodes, depth, expanded, onToggle }: FileTreeRowsP
               </button>
               {open && (
                 <ul>
-                  <FileTreeRows nodes={node.children} depth={depth + 1} expanded={expanded} onToggle={onToggle} />
+                  <FileTreeRows
+                    nodes={node.children}
+                    depth={depth + 1}
+                    expanded={expanded}
+                    onToggle={onToggle}
+                    highlights={highlights}
+                  />
                 </ul>
               )}
             </li>
@@ -43,12 +51,20 @@ export function FileTreeRows({ nodes, depth, expanded, onToggle }: FileTreeRowsP
 
         const { entry } = node
         const skipped = entry.state === 'skipped'
+        const highlightLine = highlights?.get(node.path)
+        const highlighted = highlightLine !== undefined
         return (
           <li key={node.path}>
-            <div className={styles.row} style={indent} data-skipped={skipped || undefined}>
+            <div
+              className={styles.row}
+              style={indent}
+              data-skipped={skipped || undefined}
+              data-highlighted={highlighted || undefined}
+            >
               <span className={styles.spacer} aria-hidden="true" />
               <Icon name="file" size={14} className={styles.icon} />
               <span className={styles.name}>{node.name}</span>
+              {highlighted && <span className={styles.related}>관련 파일 · {highlightLine}행</span>}
               {skipped && (
                 <span className={styles.skip} tabIndex={0} aria-describedby={`skip-${node.path}`}>
                   읽기 실패
