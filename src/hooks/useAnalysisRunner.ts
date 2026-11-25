@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAnalysis, startAnalysis } from '../api/analyses'
-import { ApiRequestError } from '../api/client'
-import type { Analysis, ApiError } from '../api/contract'
+import { ApiRequestError, clientError, type AppError } from '../api/client'
+import type { Analysis } from '../api/contract'
 import { ANALYSIS_POLL_INTERVAL_MS, ANALYSIS_TIMEOUT_MS } from '../app/config'
 import { wait } from '../lib/wait'
 
@@ -13,19 +13,10 @@ export type AnalysisRunState =
    * analysis가 있으면 분석이 status: failed로 끝난 것, 없으면 요청 자체가 실패한 것.
    * attempt는 실행할 때마다 늘어나는 번호라 오류 화면의 key로 쓴다.
    */
-  | { phase: 'failed'; analysis: Analysis | null; error: ApiError; attempt: number }
+  | { phase: 'failed'; analysis: Analysis | null; error: AppError; attempt: number }
 
-const TIMEOUT_ERROR: ApiError = {
-  code: 'INTERNAL_ERROR',
-  message: '분석이 오래 걸리고 있어요. 입력한 주소는 그대로 두었어요. 잠시 후 다시 시도해 주세요.',
-  retryable: true,
-}
-
-const UNKNOWN_ERROR: ApiError = {
-  code: 'INTERNAL_ERROR',
-  message: '입력한 주소는 그대로 두었어요. 잠시 후 다시 시도해 주세요.',
-  retryable: true,
-}
+const TIMEOUT_ERROR = clientError('timeout')
+const UNKNOWN_ERROR = clientError('unknown')
 
 /**
  * 분석을 시작하고 끝날 때까지 폴링한다.

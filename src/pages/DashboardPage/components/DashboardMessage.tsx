@@ -1,4 +1,4 @@
-import type { ApiError } from '../../../api/contract'
+import type { AppError } from '../../../api/client'
 import { Alert } from '../../../components/ui/Alert'
 import { Button } from '../../../components/ui/Button'
 import { Spinner } from '../../../components/ui/Spinner'
@@ -16,7 +16,7 @@ export function DashboardLoading() {
 }
 
 interface DashboardErrorProps {
-  error: ApiError
+  error: AppError
   onAnalyzeOther: () => void
 }
 
@@ -25,7 +25,7 @@ export function DashboardError({ error, onAnalyzeOther }: DashboardErrorProps) {
   const view =
     error.code === 'ANALYSIS_NOT_FOUND'
       ? { tone: 'error' as const, title: '분석 결과를 찾을 수 없어요', body: '저장소 주소를 다시 입력해 분석해 주세요.' }
-      : describeAnalysisError(error)
+      : describeAnalysisError(error, { keepInputNote: false })
 
   return (
     <div className={styles.error}>

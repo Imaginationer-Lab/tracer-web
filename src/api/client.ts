@@ -3,23 +3,38 @@ import type { ApiError } from './contract'
 /** 브라우저는 항상 같은 출처의 /api 만 부른다. 절대 주소를 쓰지 않는다. */
 const API_BASE = '/api'
 
+/**
+ * 백엔드가 아니라 프론트가 만든 오류의 종류.
+ * - unreachable: 백엔드에 닿지 못함 (네트워크 오류, 프록시 502·504 등 { error } 본문이 없는 응답)
+ * - timeout: 분석이 제한 시간 안에 끝나지 않음
+ * - unknown: 그 밖에 예상하지 못한 오류
+ */
+export type ClientErrorKind = 'unreachable' | 'timeout' | 'unknown'
+
+/** 화면에서 다루는 오류: 백엔드 ApiError, 또는 clientKind가 붙은 프론트 오류 */
+export type AppError = ApiError & { clientKind?: ClientErrorKind }
+
+const CLIENT_ERROR_MESSAGES: Record<ClientErrorKind, string> = {
+  unreachable: '서버에 연결하지 못했어요.',
+  timeout: '분석이 오래 걸리고 있어요.',
+  unknown: '알 수 없는 오류가 났어요.',
+}
+
+export function clientError(kind: ClientErrorKind): AppError {
+  return { code: 'INTERNAL_ERROR', message: CLIENT_ERROR_MESSAGES[kind], retryable: true, clientKind: kind }
+}
+
 /** 백엔드가 { error } 로 응답했거나 서버에 닿지 못했을 때 던지는 오류 */
 export class ApiRequestError extends Error {
   readonly status: number
-  readonly error: ApiError
+  readonly error: AppError
 
-  constructor(status: number, error: ApiError) {
+  constructor(status: number, error: AppError) {
     super(error.message)
     this.name = 'ApiRequestError'
     this.status = status
     this.error = error
   }
-}
-
-const NETWORK_ERROR: ApiError = {
-  code: 'INTERNAL_ERROR',
-  message: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
-  retryable: true,
 }
 
 function isApiErrorBody(body: unknown): body is { error: ApiError } {
@@ -47,18 +62,15 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     })
   } catch (cause) {
     if (cause instanceof DOMException && cause.name === 'AbortError') throw cause
-    throw new ApiRequestError(0, NETWORK_ERROR)
+    throw new ApiRequestError(0, clientError('unreachable'))
   }
 
   const payload: unknown = await response.json().catch(() => null)
 
   if (!response.ok) {
     if (isApiErrorBody(payload)) throw new ApiRequestError(response.status, payload.error)
-    throw new ApiRequestError(response.status, {
-      code: 'INTERNAL_ERROR',
-      message: '일시적인 서버 오류가 났어요. 잠시 후 다시 시도해 주세요.',
-      retryable: true,
-    })
+    // 백엔드는 실패하면 항상 { error } 를 준다. 그게 없으면 중간(프록시 등)에서 막힌 것으로 본다
+    throw new ApiRequestError(response.status, clientError('unreachable'))
   }
 
   return payload as T

@@ -1,26 +1,17 @@
 import { useEffect, useState } from 'react'
 import { getAnalysis } from '../api/analyses'
-import { ApiRequestError } from '../api/client'
-import type { Analysis, ApiError } from '../api/contract'
+import { ApiRequestError, clientError, type AppError } from '../api/client'
+import type { Analysis } from '../api/contract'
 import { ANALYSIS_POLL_INTERVAL_MS, ANALYSIS_TIMEOUT_MS } from '../app/config'
 import { wait } from '../lib/wait'
 
 export type AnalysisLoad =
   | { phase: 'loading'; analysis: Analysis | null }
   | { phase: 'done'; analysis: Analysis }
-  | { phase: 'error'; error: ApiError }
+  | { phase: 'error'; error: AppError }
 
-const TIMEOUT_ERROR: ApiError = {
-  code: 'INTERNAL_ERROR',
-  message: '분석이 오래 걸리고 있어요. 잠시 후 다시 시도해 주세요.',
-  retryable: true,
-}
-
-const UNKNOWN_ERROR: ApiError = {
-  code: 'INTERNAL_ERROR',
-  message: '분석 결과를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
-  retryable: true,
-}
+const TIMEOUT_ERROR = clientError('timeout')
+const UNKNOWN_ERROR = clientError('unknown')
 
 /**
  * 대시보드에서 분석 결과를 불러온다. 아직 running이면 끝날 때까지 폴링한다.
