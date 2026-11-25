@@ -14,7 +14,7 @@ npm run dev        # http://localhost:9000
 
 브라우저는 같은 출처의 `/api`만 부르고, 개발 서버가 `/api`를 백엔드로 넘긴다.
 백엔드는 `tracer-backend`에서 `docker compose up -d --build`로 띄운다 (기본 `http://localhost:3000`).
-다른 주소를 쓰려면 `.env.local`에 `API_PROXY_TARGET`을 넣는다 (`.env.example` 참고).
+다른 주소를 쓰려면 `.env.local`에 `API_PROXY_TARGET=http://<백엔드 주소>`를 넣는다.
 
 ```bash
 npm run typecheck
