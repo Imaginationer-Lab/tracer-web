@@ -1,0 +1,67 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-hairline);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+  }
+}
+
+.error {
+  border-left-color: var(--color-error);
+
+  .icon {
+    color: var(--color-error);
+  }
+}
+
+.warning {
+  border-left-color: var(--color-warning-deep);
+
+  .icon {
+    color: var(--color-warning-deep);
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.title {
+  color: var(--color-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.body {
+  color: var(--color-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.action {
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    /* 아이콘 폭(16) + 간격(10)만큼 들여서 본문 아래에 둔다 */
+    flex-basis: 100%;
+    padding-left: 26px;
+  }
+}
