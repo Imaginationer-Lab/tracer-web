@@ -1,5 +1,6 @@
 import type { CodeFacts, DemoEvent, EvidenceItem, ProviderDetail, ProviderSummary } from '../api/contract'
 import { josa } from './korean'
+import { primaryLocation, type SameCategory } from './sameCategory'
 import { formatKstTime } from './time'
 
 /** 응답 코드 구간. 원인은 확정하지 않고, 코드 구간별로 먼저 볼 곳만 안내한다. */
@@ -56,10 +57,30 @@ const BASIS: Record<StatusClass, (code: number) => string> = {
 }
 
 /**
+ * 같은 분류 서비스로 요청을 넘길 수 있는지 검토하는 항목. 대체할 수 있다고 단정하지 않는다.
+ * 예: 이미 연동된 Toss Payments 쪽으로 결제 요청을 넘길 수 있는지 검토하기
+ */
+function sameCategoryStep(same: SameCategory): GuideStep {
+  const names = same.services.map((service) => service.name).join(' · ')
+  const first = same.services[0]
+  const location = primaryLocation(first)
+  return {
+    text: `이미 연동된 ${names} 쪽으로 ${same.label} 요청을 넘길 수 있는지 검토하기`,
+    codeFact: location ? `코드 확인 · ${location}에서 ${first.name} 호출을 찾았어요` : undefined,
+  }
+}
+
+/**
  * 데모 재현 이벤트 + 선택한 공급자의 근거로 대응 가이드를 만든다.
  * 문구는 figdora "데모 재현 + Stripe 선택" 시안의 대응 가이드를 따른다.
+ * same: 같은 분류로 호출되고 있는 다른 서비스. 공급자 쪽 장애(5xx)일 때만 검토 항목으로 넣는다.
  */
-export function buildResponseGuide(event: DemoEvent, provider: ProviderSummary, detail: ProviderDetail): ResponseGuide {
+export function buildResponseGuide(
+  event: DemoEvent,
+  provider: ProviderSummary,
+  detail: ProviderDetail,
+  same: SameCategory | null = null,
+): ResponseGuide {
   const statusClass = classifyStatus(event.httpStatus)
   const code = event.httpStatus
   const primary = detail.evidence[0]
@@ -84,6 +105,7 @@ export function buildResponseGuide(event: DemoEvent, provider: ProviderSummary, 
     statusClass === 'server'
       ? [
           { text: `${provider.role} 실패 시 사용자에게 ‘잠시 후 다시 시도해 주세요’ 안내 띄우기` },
+          ...(same ? [sameCategoryStep(same)] : []),
           { text: '재시도에 백오프와 타임아웃 적용하기', codeFact: fact },
           { text: `실패한 ${provider.role} 요청을 모아 두었다가 공급자 복구 후 재처리하기` },
         ]

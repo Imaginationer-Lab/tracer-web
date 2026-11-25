@@ -15,6 +15,8 @@ interface ProviderDetailMobileProps {
   onBack: () => void
   /** 데모 재현 이벤트 카드 (재현 중이고 이 공급자의 이벤트일 때) */
   demoEvent?: ReactNode
+  /** 같은 분류 서비스 (관련 파일 아래) */
+  sameCategory?: ReactNode
   /** 대응 가이드 (관련 파일 아래) */
   guide?: ReactNode
 }
@@ -27,6 +29,7 @@ export function ProviderDetailMobile({
   onRetryDetail,
   onBack,
   demoEvent,
+  sameCategory,
   guide,
 }: ProviderDetailMobileProps) {
   const status = describeProviderStatus(provider, statusLoad)
@@ -52,6 +55,7 @@ export function ProviderDetailMobile({
         footer={
           <>
             <RelatedFiles files={provider.files} />
+            {sameCategory}
             {guide}
           </>
         }
