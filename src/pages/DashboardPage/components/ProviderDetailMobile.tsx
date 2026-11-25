@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react'
 import type { ProviderSummary } from '../../../api/contract'
-import { Icon } from '../../../components/icons/Icon'
 import { StatusPill } from '../../../components/ui/StatusPill'
 import type { ProviderDetailLoad } from '../../../hooks/useProviderDetail'
 import { describeProviderStatus, type ProviderStatusLoad } from '../../../lib/providerStatus'
 import { EvidencePanel } from './EvidencePanel'
-import styles from './ProviderDetailMobile.module.css'
+import { MobileDetailLayout } from './MobileDetailLayout'
 import { RelatedFiles } from './RelatedFiles'
 
 interface ProviderDetailMobileProps {
@@ -33,38 +32,30 @@ export function ProviderDetailMobile({
   const status = describeProviderStatus(provider, statusLoad)
 
   return (
-    <div className={styles.detail}>
-      <div className={styles.topBar}>
-        <button type="button" className={styles.back} onClick={onBack}>
-          <Icon name="chevronLeft" size={18} />
-          서비스 목록
-        </button>
-      </div>
-      <main className={styles.body}>
-        <header className={styles.title}>
-          <h1>
-            {provider.name}
-            <span className={styles.role}>{provider.role}</span>
-          </h1>
-          <div className={styles.status}>
-            <StatusPill label={status.label} tone={status.tone} marker={status.marker} />
-            <span>{status.meta}</span>
-          </div>
-        </header>
-        {demoEvent}
-        <EvidencePanel
-          provider={provider}
-          load={detailLoad}
-          onRetry={onRetryDetail}
-          title="근거"
-          footer={
-            <>
-              <RelatedFiles provider={provider} />
-              {guide}
-            </>
-          }
-        />
-      </main>
-    </div>
+    <MobileDetailLayout
+      title={provider.name}
+      subtitle={provider.role}
+      onBack={onBack}
+      status={
+        <>
+          <StatusPill label={status.label} tone={status.tone} marker={status.marker} />
+          <span>{status.meta}</span>
+        </>
+      }
+    >
+      {demoEvent}
+      <EvidencePanel
+        provider={provider}
+        load={detailLoad}
+        onRetry={onRetryDetail}
+        title="근거"
+        footer={
+          <>
+            <RelatedFiles files={provider.files} />
+            {guide}
+          </>
+        }
+      />
+    </MobileDetailLayout>
   )
 }
