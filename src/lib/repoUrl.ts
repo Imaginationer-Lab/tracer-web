@@ -8,3 +8,9 @@ export function normalizeRepoUrl(input: string): string {
 export function isValidRepoUrl(url: string): boolean {
   return REPO_URL_PATTERN.test(url)
 }
+
+/** github.com/{owner}/{repo} 주소에서 owner·repo를 뽑는다 (.git, 하위 경로는 무시) */
+export function parseRepoUrl(url: string): { owner: string; name: string } | null {
+  const match = /^https:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/.*)?$/.exec(url.trim())
+  return match ? { owner: match[1], name: match[2] } : null
+}
