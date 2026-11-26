@@ -6,6 +6,7 @@ import { Card, CardHeader } from '../../../components/ui/Card'
 import { Spinner } from '../../../components/ui/Spinner'
 import type { ProviderDetailLoad } from '../../../hooks/useProviderDetail'
 import { EvidenceItem } from './EvidenceItem'
+import { HostProbeList } from './HostProbeList'
 import styles from './EvidencePanel.module.css'
 
 interface EvidencePanelProps {
@@ -18,6 +19,8 @@ interface EvidencePanelProps {
   footer?: ReactNode
   /** 파일 트리에서 누른 파일. 그 파일의 첫 근거를 펼치고 보이게 스크롤한다 (같은 파일을 다시 누르면 seq가 바뀐다) */
   reveal?: EvidenceReveal
+  /** 데모 재현 이벤트의 공급자면 그 HTTP 코드 (서버 응답 줄에 재현 칩을 붙인다) */
+  replayStatus?: number
   className?: string
 }
 
@@ -26,7 +29,13 @@ export interface EvidenceReveal {
   seq: number
 }
 
-function Body({ provider, load, onRetry, reveal }: Pick<EvidencePanelProps, 'provider' | 'load' | 'onRetry' | 'reveal'>) {
+function Body({
+  provider,
+  load,
+  onRetry,
+  reveal,
+  replayStatus,
+}: Pick<EvidencePanelProps, 'provider' | 'load' | 'onRetry' | 'reveal' | 'replayStatus'>) {
   if (load.phase === 'loading') {
     return (
       <div className={styles.loading} role="status">
@@ -59,14 +68,21 @@ function Body({ provider, load, onRetry, reveal }: Pick<EvidencePanelProps, 'pro
     )
   }
 
-  const { evidence } = load.detail
+  const { evidence, hosts } = load.detail
   const revealIndex = reveal ? evidence.findIndex((item) => item.path === reveal.path) : -1
+  const hostList = <HostProbeList hosts={hosts} replayStatus={replayStatus} />
   if (evidence.length === 0) {
-    return <p className={styles.empty}>이 저장소에서 관련 파일을 찾지 못했어요</p>
+    return (
+      <>
+        {hostList}
+        <p className={styles.empty}>이 저장소에서 관련 파일을 찾지 못했어요</p>
+      </>
+    )
   }
 
   return (
     <>
+      {hostList}
       {provider.usage === 'declared-only' && (
         <p className={styles.note}>
           의존성에 {provider.name}가 있지만 코드에서 호출 위치를 찾지 못했어요. 간접 호출이거나 쓰지 않는 의존성일 수 있어요.
@@ -87,7 +103,7 @@ function Body({ provider, load, onRetry, reveal }: Pick<EvidencePanelProps, 'pro
 }
 
 /** 선택한 공급자의 근거 목록 (강한 근거 순) */
-export function EvidencePanel({ provider, load, onRetry, title, footer, reveal, className }: EvidencePanelProps) {
+export function EvidencePanel({ provider, load, onRetry, title, footer, reveal, replayStatus, className }: EvidencePanelProps) {
   const count = load.phase === 'loaded' ? load.detail.evidence.length : null
 
   return (
@@ -101,7 +117,7 @@ export function EvidencePanel({ provider, load, onRetry, title, footer, reveal, 
         }
       />
       <div className={styles.scroll}>
-        <Body provider={provider} load={load} onRetry={onRetry} reveal={reveal} />
+        <Body provider={provider} load={load} onRetry={onRetry} reveal={reveal} replayStatus={replayStatus} />
         {footer}
       </div>
     </Card>

@@ -1,0 +1,137 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.title {
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.caption {
+  color: var(--color-mute);
+  font-size: 12px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.name {
+  flex-shrink: 0;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.host {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-body);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 점 + 글자만 (배지 바탕 없음). 둥근 배지는 목록의 공식 상태에만 쓴다 */
+.result {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &[data-tone='success'] {
+    color: var(--color-success);
+  }
+
+  &[data-tone='error'] {
+    color: var(--color-error);
+  }
+
+  &[data-tone='neutral'] {
+    color: var(--color-body);
+  }
+}
+
+.dot,
+.hollow {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+
+.dot {
+  background: currentColor;
+}
+
+.hollow {
+  border: 1.5px solid currentColor;
+}
+
+.detail {
+  font-family: var(--font-mono);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  color: var(--color-mute);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.files {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.replay {
+  margin-left: auto;
+  color: var(--color-error);
+  font-weight: 500;
+  white-space: nowrap;
+}
