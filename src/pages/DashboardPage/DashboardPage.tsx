@@ -52,6 +52,7 @@ export function DashboardPage() {
   const demo = useDemoMode()
   const demoLoad = useDemoEvent(demo.enabled && isExample && result !== null)
   const event = demoLoad.phase === 'loaded' ? demoLoad.event : null
+  const replayStatus = event && selected?.id === event.providerId ? event.httpStatus : undefined
 
   // 대응 가이드: 재현 중이고, 이벤트의 공급자를 골랐고, 근거를 불러왔을 때만
   const guideShown = Boolean(event && selected?.id === event.providerId && detail.load.phase === 'loaded')
@@ -94,6 +95,7 @@ export function DashboardPage() {
         onRetryDetail={detail.retry}
         onBack={backToList}
         demoEvent={event?.providerId === selected.id ? demoArea : null}
+        replayStatus={replayStatus}
         sameCategory={sameNote}
         guide={guide}
       />
@@ -161,6 +163,7 @@ export function DashboardPage() {
                 load={detail.load}
                 onRetry={detail.retry}
                 reveal={reveal?.providerId === selected.id ? reveal : undefined}
+                replayStatus={replayStatus}
                 footer={
                   <>
                     {sameNote}
