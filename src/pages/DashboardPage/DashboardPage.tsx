@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import type { Analysis, AnalysisResult } from '../../api/contract'
 import { paths } from '../../app/paths'
@@ -16,7 +16,7 @@ import { findSameCategory, type SameCategory } from '../../lib/sameCategory'
 import { DashboardError, DashboardLoading } from './components/DashboardMessage'
 import { DemoEventArea } from './components/DemoEventArea'
 import { DemoToggle } from './components/DemoToggle'
-import { EvidencePanel } from './components/EvidencePanel'
+import { EvidencePanel, type EvidenceReveal } from './components/EvidencePanel'
 import { EvidencePlaceholder } from './components/EvidencePlaceholder'
 import { FileTreeCard, type FileHighlight } from './components/FileTreeCard'
 import { NoProvidersState } from './components/NoProvidersState'
@@ -66,6 +66,20 @@ export function DashboardPage() {
     return { key: `provider:${selected.id}${marks ? ':guide' : ''}`, label: selected.name, files: selected.files, marks }
   }, [selected, same, guideShown])
   const sameNote = same && <SameCategoryNote same={same} onSelect={selectProvider} />
+
+  // 파일 트리에서 칩이 달린 파일을 누르면: 관련 파일은 근거 카드로, 같은 분류 파일은 그 서비스로
+  const [reveal, setReveal] = useState<(EvidenceReveal & { providerId: string }) | null>(null)
+  // 다른 서비스로 바꾸면 잊는다 (돌아왔을 때 예전 파일로 다시 스크롤하지 않게)
+  if (reveal && reveal.providerId !== selected?.id) setReveal(null)
+  const openFile = (path: string) => {
+    if (!selected) return
+    if (selected.files.some((file) => file.path === path)) {
+      setReveal((prev) => ({ providerId: selected.id, path, seq: (prev?.seq ?? 0) + 1 }))
+      return
+    }
+    const owner = same?.services.find((service) => service.files.some((file) => file.path === path))
+    if (owner) selectProvider(owner.id)
+  }
   const demoArea = <DemoEventArea load={demoLoad} providers={providers} onTurnOff={() => demo.setEnabled(false)} />
   const demoToggle = (variant: 'header' | 'bar') =>
     result && isExample && <DemoToggle enabled={demo.enabled} onChange={demo.setEnabled} variant={variant} />
@@ -139,13 +153,14 @@ export function DashboardPage() {
             <p className={styles.mobileHint}>서비스를 누르면 근거 파일과 코드를 볼 수 있어요.</p>
           </div>
           <div className={styles.right}>
-            <FileTreeCard result={result} highlight={highlight} className={styles.tree} />
+            <FileTreeCard result={result} highlight={highlight} onFileClick={openFile} className={styles.tree} />
             {selected ? (
               <EvidencePanel
                 key={selected.id}
                 provider={selected}
                 load={detail.load}
                 onRetry={detail.retry}
+                reveal={reveal?.providerId === selected.id ? reveal : undefined}
                 footer={
                   <>
                     {sameNote}

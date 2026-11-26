@@ -20,6 +20,8 @@ interface FileTreeCardProps {
   result: AnalysisResult
   /** 선택한 공급자·서비스의 근거 파일. 강조하고 상위 폴더를 펼친다 */
   highlight?: FileHighlight
+  /** 칩이 달린 파일(강조·보조 표시)을 눌렀을 때 */
+  onFileClick?: (path: string) => void
   className?: string
 }
 
@@ -47,7 +49,7 @@ function withAncestorsOf(expanded: Set<string>, paths: Iterable<string>): Set<st
  * 파일 트리. 데스크톱에서는 항상 펼쳐 두고, 모바일에서는 머리글을 눌러 접고 편다.
  * (모바일에서는 읽기 실패가 있을 때만 처음부터 펼친다)
  */
-export function FileTreeCard({ result, highlight, className }: FileTreeCardProps) {
+export function FileTreeCard({ result, highlight, onFileClick, className }: FileTreeCardProps) {
   const tree = useMemo(() => buildFileTree(result.files), [result.files])
   const highlights = useMemo(
     () => new Map(highlight ? highlight.files.map((file) => [file.path, file.line] as const) : []),
@@ -108,7 +110,15 @@ export function FileTreeCard({ result, highlight, className }: FileTreeCardProps
         <Icon name="chevronDown" size={16} className={styles.toggleIcon} />
       </button>
       <ul className={styles.tree} ref={treeRef}>
-        <FileTreeRows nodes={tree} depth={0} expanded={expanded} onToggle={toggle} highlights={highlights} marks={marks} />
+        <FileTreeRows
+          nodes={tree}
+          depth={0}
+          expanded={expanded}
+          onToggle={toggle}
+          highlights={highlights}
+          marks={marks}
+          onFileClick={onFileClick}
+        />
       </ul>
     </Card>
   )

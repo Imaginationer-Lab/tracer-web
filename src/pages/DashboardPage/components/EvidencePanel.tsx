@@ -16,10 +16,17 @@ interface EvidencePanelProps {
   title?: string
   /** 근거 목록 아래에 붙는 내용 (관련 파일, 대응 가이드) */
   footer?: ReactNode
+  /** 파일 트리에서 누른 파일. 그 파일의 첫 근거를 펼치고 보이게 스크롤한다 (같은 파일을 다시 누르면 seq가 바뀐다) */
+  reveal?: EvidenceReveal
   className?: string
 }
 
-function Body({ provider, load, onRetry }: Pick<EvidencePanelProps, 'provider' | 'load' | 'onRetry'>) {
+export interface EvidenceReveal {
+  path: string
+  seq: number
+}
+
+function Body({ provider, load, onRetry, reveal }: Pick<EvidencePanelProps, 'provider' | 'load' | 'onRetry' | 'reveal'>) {
   if (load.phase === 'loading') {
     return (
       <div className={styles.loading} role="status">
@@ -53,6 +60,7 @@ function Body({ provider, load, onRetry }: Pick<EvidencePanelProps, 'provider' |
   }
 
   const { evidence } = load.detail
+  const revealIndex = reveal ? evidence.findIndex((item) => item.path === reveal.path) : -1
   if (evidence.length === 0) {
     return <p className={styles.empty}>이 저장소에서 관련 파일을 찾지 못했어요</p>
   }
@@ -66,7 +74,12 @@ function Body({ provider, load, onRetry }: Pick<EvidencePanelProps, 'provider' |
       )}
       <ul>
         {evidence.map((item, index) => (
-          <EvidenceItem key={`${item.path}:${item.line}:${item.reason.kind}`} evidence={item} primary={index === 0} />
+          <EvidenceItem
+            key={`${item.path}:${item.line}:${item.reason.kind}`}
+            evidence={item}
+            primary={index === 0}
+            reveal={index === revealIndex ? reveal?.seq : undefined}
+          />
         ))}
       </ul>
     </>
@@ -74,7 +87,7 @@ function Body({ provider, load, onRetry }: Pick<EvidencePanelProps, 'provider' |
 }
 
 /** 선택한 공급자의 근거 목록 (강한 근거 순) */
-export function EvidencePanel({ provider, load, onRetry, title, footer, className }: EvidencePanelProps) {
+export function EvidencePanel({ provider, load, onRetry, title, footer, reveal, className }: EvidencePanelProps) {
   const count = load.phase === 'loaded' ? load.detail.evidence.length : null
 
   return (
@@ -88,7 +101,7 @@ export function EvidencePanel({ provider, load, onRetry, title, footer, classNam
         }
       />
       <div className={styles.scroll}>
-        <Body provider={provider} load={load} onRetry={onRetry} />
+        <Body provider={provider} load={load} onRetry={onRetry} reveal={reveal} />
         {footer}
       </div>
     </Card>
