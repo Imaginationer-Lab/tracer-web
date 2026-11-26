@@ -12,6 +12,7 @@
   text-align: left;
 }
 
+/* 눌리는 행(폴더, 칩이 달린 파일)만 호버에 반응한다. 칩이 없는 파일은 div라 반응이 없다 */
 button.row:hover {
   background: var(--color-hairline-soft);
 }
@@ -59,6 +60,19 @@ button.row:hover {
 
   .name {
     font-weight: 600;
+  }
+}
+
+/* 강조 바탕은 호버해도 유지하고, 파일 이름 밑줄로 눌린다는 것을 알린다 */
+button.row[data-highlighted]:hover {
+  background: var(--color-highlight);
+}
+
+button.row[data-highlighted],
+button.row[data-marked] {
+  &:hover .name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 }
 
