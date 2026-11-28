@@ -19,6 +19,8 @@ interface ProviderDetailMobileProps {
   replayStatus?: number
   /** 같은 분류 서비스 (관련 파일 아래) */
   sameCategory?: ReactNode
+  /** 대체 서비스 (AI 제안, 같은 분류 아래) */
+  alternatives?: ReactNode
   /** 대응 가이드 (관련 파일 아래) */
   guide?: ReactNode
 }
@@ -33,6 +35,7 @@ export function ProviderDetailMobile({
   demoEvent,
   replayStatus,
   sameCategory,
+  alternatives,
   guide,
 }: ProviderDetailMobileProps) {
   const status = describeProviderStatus(provider, statusLoad)
@@ -60,6 +63,7 @@ export function ProviderDetailMobile({
           <>
             <RelatedFiles files={provider.files} />
             {sameCategory}
+            {alternatives}
             {guide}
           </>
         }

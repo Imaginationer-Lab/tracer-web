@@ -7,6 +7,8 @@ const PATHS = {
     </>
   ),
   check: <path d="M5 12l5 5 9-10" />,
+  minus: <path d="M5 12h14" />,
+  x: <path d="M6 6l12 12M18 6L6 18" />,
   info: (
     <>
       <circle cx="12" cy="12" r="9" />
