@@ -4,10 +4,10 @@ import { getProviderStatus } from '../api/providers'
 import type { ProviderStatusLoad } from '../lib/providerStatus'
 
 /**
- * statusSupport === 'live' 인 공급자의 공개 상태를 조회한다.
+ * statusSupport === 'live' 인 공급자의 공개 상태를 조회한다 (탐지된 공급자, 대체 서비스 후보 모두).
  * 실패는 그 공급자에만 표시하고, 목록·파일 트리는 그대로 쓴다.
  */
-export function useProviderStatuses(providers: ProviderSummary[]) {
+export function useProviderStatuses(providers: Pick<ProviderSummary, 'id' | 'statusSupport'>[]) {
   const [statuses, setStatuses] = useState<Partial<Record<ProviderId, ProviderStatusLoad>>>({})
   const controllersRef = useRef(new Map<ProviderId, AbortController>())
 
