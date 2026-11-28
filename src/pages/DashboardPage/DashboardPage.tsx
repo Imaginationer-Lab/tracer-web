@@ -7,12 +7,14 @@ import { Alert } from '../../components/ui/Alert'
 import { Button } from '../../components/ui/Button'
 import { useAnalysis } from '../../hooks/useAnalysis'
 import { MOBILE_QUERY, useMediaQuery } from '../../hooks/useMediaQuery'
+import { useProviderAlternatives } from '../../hooks/useProviderAlternatives'
 import { useProviderDetail } from '../../hooks/useProviderDetail'
 import { useProviderStatuses } from '../../hooks/useProviderStatuses'
 import { useDemoEvent } from '../../hooks/useDemoEvent'
 import { isExampleRepo } from '../../lib/exampleRepo'
 import { buildResponseGuide } from '../../lib/responseGuide'
 import { findSameCategory, type SameCategory } from '../../lib/sameCategory'
+import { AlternativesSection } from './components/AlternativesSection'
 import { DashboardError, DashboardLoading } from './components/DashboardMessage'
 import { DemoEventArea } from './components/DemoEventArea'
 import { DemoToggle } from './components/DemoToggle'
@@ -46,6 +48,7 @@ export function DashboardPage() {
   const { statuses, refetch } = useProviderStatuses(providers)
   const { selected, selectProvider, backToList } = useProviderSelection(providers, isMobile)
   const detail = useProviderDetail(analysisId, selected?.id)
+  const alternatives = useProviderAlternatives(analysisId, selected?.id)
   const same = useMemo(() => (selected ? findSameCategory(selected, providers) : null), [selected, providers])
   // 데모 재현은 시연용 장치라 공개 예제 저장소에서만 쓴다 (다른 저장소에서는 ?demo=1 이 있어도 무시)
   const isExample = analysis !== null && isExampleRepo(analysis.repo)
@@ -81,6 +84,16 @@ export function DashboardPage() {
     const owner = same?.services.find((service) => service.files.some((file) => file.path === path))
     if (owner) selectProvider(owner.id)
   }
+  // 대체 서비스 (AI 제안): 같은 분류 안내 아래, 대응 가이드 위. 모바일 상세에는 근거로 스크롤하는 동작이 없어 위치를 글자로만 보여 준다
+  const alternativesSection = (canOpenFile: boolean) =>
+    selected && (
+      <AlternativesSection
+        provider={selected}
+        load={alternatives.load}
+        onStart={alternatives.start}
+        onOpenFile={canOpenFile ? openFile : undefined}
+      />
+    )
   const demoArea = <DemoEventArea load={demoLoad} providers={providers} onTurnOff={() => demo.setEnabled(false)} />
   const demoToggle = (variant: 'header' | 'bar') =>
     result && isExample && <DemoToggle enabled={demo.enabled} onChange={demo.setEnabled} variant={variant} />
@@ -97,6 +110,7 @@ export function DashboardPage() {
         demoEvent={event?.providerId === selected.id ? demoArea : null}
         replayStatus={replayStatus}
         sameCategory={sameNote}
+        alternatives={alternativesSection(false)}
         guide={guide}
       />
     )
@@ -167,6 +181,7 @@ export function DashboardPage() {
                 footer={
                   <>
                     {sameNote}
+                    {alternativesSection(true)}
                     {guide}
                   </>
                 }

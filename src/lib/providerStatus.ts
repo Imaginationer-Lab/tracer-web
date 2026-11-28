@@ -29,7 +29,7 @@ const STATE_VIEW: Record<ProviderStatus['state'], Pick<ProviderStatusView, 'labe
 }
 
 /** 공급자 행의 상태 배지와 보조 문구. 문구는 figdora "공급자 상태 배지" 시트를 따른다. */
-export function describeProviderStatus(provider: ProviderSummary, load: ProviderStatusLoad | undefined): ProviderStatusView {
+export function describeProviderStatus(provider: Pick<ProviderSummary, 'statusSupport'>, load: ProviderStatusLoad | undefined): ProviderStatusView {
   if (provider.statusSupport === 'none') {
     return { label: '실시간 연동 전', tone: 'neutral', marker: 'solid', meta: '공식 상태 미연동', retryable: false }
   }

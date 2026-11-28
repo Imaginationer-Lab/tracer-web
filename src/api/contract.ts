@@ -1,4 +1,4 @@
-// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 e1d8abc, 브랜치 main).
+// 백엔드 응답 계약. tracer-backend의 src/api/contract.ts를 그대로 복사한 파일이다 (기준 커밋 f6088e7, 브랜치 main).
 // 직접 고치지 말고, 백엔드가 바뀌면 다시 복사한다. 명세: tracer-backend docs/frontend-handoff.md
 
 /** 서비스 id. 소문자·숫자·하이픈 (예: supabase, stripe, aws-s3, toss-payments). 탐지되는 서비스는 고정되어 있지 않다 */
@@ -31,6 +31,7 @@ export type ErrorCode =
   | 'BAD_REQUEST'
   | 'NOT_FOUND'
   | 'DETECTION_UNAVAILABLE'
+  | 'ALTERNATIVES_UNAVAILABLE'
   | 'INTERNAL_ERROR';
 
 export interface ApiError {
@@ -132,6 +133,46 @@ export interface ProviderDetail {
   evidence: EvidenceItem[];
   /** 호스트별 응답 확인. 세부정보를 열 때 확인한다 (호스트당 60초 캐시). 확인할 호스트가 없으면 [] */
   hosts: ServiceHost[];
+}
+
+/** 고칠 양이 적은 순: drop-in < in-repo < rewrite */
+export type AlternativeFit = 'drop-in' | 'in-repo' | 'rewrite';
+
+export interface UsedFeature {
+  /** 기능 식별자 (coverage에서 가리킨다). 예: 'checkout-session' */
+  key: string;
+  /** 화면 문구. 예: '결제창 생성' */
+  label: string;
+  /** 이 기능을 쓰는 코드 위치 */
+  files: { path: string; line: number }[];
+}
+
+/** AI 제안이다 (서버가 검증하지 않음). 화면에 "AI 제안"이라고 표시한다 */
+export interface Alternative {
+  id: ProviderId;
+  name: string;
+  category: ProviderCategory;
+  fit: AlternativeFit;
+  /** '주소·키만 바꾸면 됨' | '저장소에 이미 있음' | '코드 수정 필요' */
+  fitLabel: string;
+  summary: string;
+  /** 쓰는 기능마다 대체 서비스에서 되는지. features와 같은 순서 */
+  coverage: { feature: string; support: 'yes' | 'partial' | 'no'; note: string | null }[];
+  changes: {
+    /** 바꿔야 할 설정 키 */
+    settings: string[];
+    /** 고쳐야 할 파일. drop-in이면 대개 [] */
+    files: { path: string; line: number }[];
+  };
+  statusSupport: 'live' | 'none';
+}
+
+export interface ProviderAlternatives {
+  providerId: ProviderId;
+  features: UsedFeature[];
+  /** 최대 3개, 고칠 양이 적은 순. 없으면 [] */
+  alternatives: Alternative[];
+  generatedAt: string;
 }
 
 export interface ProviderStatus {
